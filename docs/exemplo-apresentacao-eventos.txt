@@ -1,0 +1,85 @@
+0 | CONFIGURACAO | sistema | Configuracao[carga=docs\carga-apresentacao.txt, politica=RR, quantum=2, troca=1, pagina=16, molduras=1, falta=3, disco=2, terminal=2, semente=42, saida=resultados\estudo-apresentacao-20260919-153035\passo-a-passo]
+0 | MODELO | sistema | Prioridade não preemptiva; menor valor vence; semente registrada, sem aleatoriedade.
+0 | CHEGADA | P1 | prioridade=1; paginas=2
+0 | ESTADO_THREAD | P1/T1 | NOVO -> PRONTO; causa=admissão
+0 | ESTADO_PROCESSO | P1 | NOVO -> PRONTO; causa=admissão
+0 | FILA_PRONTOS | P1/T1 | causa=admissão
+0 | ESTADO_THREAD | P1/T2 | NOVO -> PRONTO; causa=admissão
+0 | FILA_PRONTOS | P1/T2 | causa=admissão
+0 | ADMISSAO | P1 | threads=2
+0 | INICIO_TROCA | CPU | custo=1
+1 | FIM_TROCA | CPU | Seleção entre as threads prontas neste instante.
+1 | ESTADO_THREAD | P1/T1 | PRONTO -> EXECUTANDO; causa=despacho
+1 | ESTADO_PROCESSO | P1 | PRONTO -> EXECUTANDO; causa=despacho
+1 | DESPACHO | P1/T1 | pc=0; acumulador=0
+2 | INSTRUCAO | P1/T1 | pc=0; CPU [2]
+3 | INSTRUCAO | P1/T1 | pc=0; CPU [2]
+3 | PREEMPCAO | P1/T1 | Quantum esgotado.
+3 | ESTADO_THREAD | P1/T1 | EXECUTANDO -> PRONTO; causa=fim de quantum
+3 | ESTADO_PROCESSO | P1 | EXECUTANDO -> PRONTO; causa=fim de quantum
+3 | FILA_PRONTOS | P1/T1 | causa=fim de quantum
+3 | INICIO_TROCA | CPU | custo=1
+4 | FIM_TROCA | CPU | Seleção entre as threads prontas neste instante.
+4 | ESTADO_THREAD | P1/T2 | PRONTO -> EXECUTANDO; causa=despacho
+4 | ESTADO_PROCESSO | P1 | PRONTO -> EXECUTANDO; causa=despacho
+4 | DESPACHO | P1/T2 | pc=0; acumulador=0
+5 | INSTRUCAO | P1/T2 | pc=0; CPU [4]
+6 | INSTRUCAO | P1/T2 | pc=0; CPU [4]
+6 | PREEMPCAO | P1/T2 | Quantum esgotado.
+6 | ESTADO_THREAD | P1/T2 | EXECUTANDO -> PRONTO; causa=fim de quantum
+6 | ESTADO_PROCESSO | P1 | EXECUTANDO -> PRONTO; causa=fim de quantum
+6 | FILA_PRONTOS | P1/T2 | causa=fim de quantum
+6 | INICIO_TROCA | CPU | custo=1
+7 | FIM_TROCA | CPU | Seleção entre as threads prontas neste instante.
+7 | ESTADO_THREAD | P1/T1 | PRONTO -> EXECUTANDO; causa=despacho
+7 | ESTADO_PROCESSO | P1 | PRONTO -> EXECUTANDO; causa=despacho
+7 | DESPACHO | P1/T1 | pc=1; acumulador=2
+8 | INSTRUCAO | P1/T1 | pc=1; MEM [17]
+8 | FALTA_PAGINA | P1/T1 | pagina=1
+8 | BLOQUEIO | P1/T1 | falta de página 1
+8 | ESTADO_THREAD | P1/T1 | EXECUTANDO -> BLOQUEADO; causa=falta de página 1
+8 | ESTADO_PROCESSO | P1 | EXECUTANDO -> PRONTO; causa=falta de página 1
+8 | INICIO_PAGINACAO | P1/T1 | pagina=1
+8 | INICIO_TROCA | CPU | custo=1
+9 | FIM_TROCA | CPU | Seleção entre as threads prontas neste instante.
+9 | ESTADO_THREAD | P1/T2 | PRONTO -> EXECUTANDO; causa=despacho
+9 | ESTADO_PROCESSO | P1 | PRONTO -> EXECUTANDO; causa=despacho
+9 | DESPACHO | P1/T2 | pc=0; acumulador=2
+10 | INSTRUCAO | P1/T2 | pc=0; CPU [4]
+11 | CARREGAMENTO_PAGINA | P1 | pagina=1; moldura=0
+11 | TRADUCAO_APOS_FALTA | P1/T1 | pagina=1; deslocamento=1; fisico=1
+11 | INTERRUPCAO_PAGINA | P1/T1 | Referência concluída pelo paginador.
+11 | ESTADO_THREAD | P1/T1 | BLOQUEADO -> PRONTO; causa=página disponível
+11 | FILA_PRONTOS | P1/T1 | causa=página disponível
+11 | INSTRUCAO | P1/T2 | pc=0; CPU [4]
+11 | FINALIZACAO_THREAD | P1/T2 | pc=1; acumulador=4
+11 | ESTADO_THREAD | P1/T2 | EXECUTANDO -> FINALIZADO; causa=fim do programa
+11 | ESTADO_PROCESSO | P1 | EXECUTANDO -> PRONTO; causa=fim do programa
+11 | INICIO_TROCA | CPU | custo=1
+12 | FIM_TROCA | CPU | Seleção entre as threads prontas neste instante.
+12 | ESTADO_THREAD | P1/T1 | PRONTO -> EXECUTANDO; causa=despacho
+12 | ESTADO_PROCESSO | P1 | PRONTO -> EXECUTANDO; causa=despacho
+12 | DESPACHO | P1/T1 | pc=2; acumulador=1
+13 | INSTRUCAO | P1/T1 | pc=2; IO [disco, B]
+13 | SOLICITACAO_IO | P1/T1 | disco requisicao=1; bloqueante=true
+13 | BLOQUEIO | P1/T1 | E/S disco
+13 | ESTADO_THREAD | P1/T1 | EXECUTANDO -> BLOQUEADO; causa=E/S disco
+13 | ESTADO_PROCESSO | P1 | EXECUTANDO -> BLOQUEADO; causa=E/S disco
+13 | INICIO_IO | P1/T1 | disco; tipo=bloco; estado=OCUPADO; requisicao=1
+15 | INTERRUPCAO_IO | P1/T1 | resultado=disco:1:OK; entrega=caixaEntrada; pendentes=0
+15 | ESTADO_THREAD | P1/T1 | BLOQUEADO -> PRONTO; causa=interrupção disco
+15 | ESTADO_PROCESSO | P1 | BLOQUEADO -> PRONTO; causa=interrupção disco
+15 | FILA_PRONTOS | P1/T1 | causa=interrupção disco
+15 | DISPOSITIVO_LIVRE | disco | estado=LIVRE
+15 | INICIO_TROCA | CPU | custo=1
+16 | FIM_TROCA | CPU | Seleção entre as threads prontas neste instante.
+16 | ESTADO_THREAD | P1/T1 | PRONTO -> EXECUTANDO; causa=despacho
+16 | ESTADO_PROCESSO | P1 | PRONTO -> EXECUTANDO; causa=despacho
+16 | DESPACHO | P1/T1 | pc=3; acumulador=1
+17 | INSTRUCAO | P1/T1 | pc=3; CPU [1]
+17 | FINALIZACAO_THREAD | P1/T1 | pc=4; acumulador=2
+17 | ESTADO_THREAD | P1/T1 | EXECUTANDO -> FINALIZADO; causa=fim do programa
+17 | ESTADO_PROCESSO | P1 | EXECUTANDO -> FINALIZADO; causa=fim do programa
+17 | LIBERACAO_MEMORIA | P1 | Espaço de endereçamento liberado.
+17 | FINALIZACAO_PROCESSO | P1 | retorno=17
+17 | FIM_SIMULACAO | sistema | Todos os processos e requisições concluídos.

@@ -1,0 +1,19 @@
+PROCESSO P1 0 1 8
+THREAD T1
+MKDIR /dados rw
+CRIAR /dados/a.txt rw
+ABRIR /dados/a.txt rw
+ESCREVER 3 "Ola, sistema operacional!"
+FECHAR 3
+ABRIR /dados/a.txt r
+LER 4 100
+LISTAR /dados
+FECHAR 4
+REMOVER /dados/a.txt
+REMOVER /dados
+EMPILHAR 7
+DESEMPILHAR
+CPU 1
+FIM_THREAD
+FIM_PROCESSO
+

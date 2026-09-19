@@ -1,0 +1,23 @@
+SIMULADOR DE SISTEMAS OPERACIONAIS - DESKTOP GRAFICO
+
+1. Extraia TODO o ZIP em Downloads ou outra pasta gravavel.
+2. Abra a pasta SimuladorSO.
+3. De dois cliques em SimuladorSO.exe (ou INICIAR.bat).
+4. Escolha uma carga, configure a politica e clique em Executar simulacao.
+
+O Java esta incluido. Nao precisa instalar JDK, configurar PATH ou compilar.
+Mantenha app, runtime e cargas junto dos executaveis. Nao abra dentro do ZIP.
+
+Monitor: resumo, processos, threads, CPU/tempo e registro de eventos.
+A barra de tarefas e os atalhos reabrem janelas fechadas ou minimizadas.
+Cada execucao grava eventos.log e CSVs em uma subpasta nova de resultados.
+
+ALTERNATIVAS
+MENU-CLI.bat: menu textual anterior.
+Testar.exe: testes do nucleo ja compilados.
+No PowerShell: .\SimuladorCLI.exe --ajuda
+
+O pacote e especifico para Windows e arquitetura do JDK usado na geracao.
+A interface deve ser conferida no Windows antes da entrega ao professor.
+O relatorio e os detalhes de uso estao em docs. O repositorio com fontes deve
+acompanhar a entrega. Nenhuma assinatura digital foi adicionada.

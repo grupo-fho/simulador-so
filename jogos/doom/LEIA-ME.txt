@@ -1,0 +1,6 @@
+DOOM CLASSICO
+
+Esta pasta recebe Chocolate Doom + suas DLLs/licencas + doom.wad.
+O ZIP de fontes nao contem o motor nem os dados comerciais do jogo.
+Leia docs/doom.md ou use scripts/preparar-doom.ps1.
+Depois de preparada, a pasta inteira segue no pacote Windows.

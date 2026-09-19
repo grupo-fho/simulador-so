@@ -1,0 +1,13 @@
+# Exemplo explicado em guia-apresentacao.md.
+# RR, quantum 2, troca 1, pagina 16, molduras 1, falta 3, disco 2.
+PROCESSO P1 0 1 2
+THREAD T1
+CPU 2
+MEM 17
+IO disco B
+CPU 1
+FIM_THREAD
+THREAD T2
+CPU 4
+FIM_THREAD
+FIM_PROCESSO

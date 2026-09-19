@@ -1,0 +1,8 @@
+cenario,carga,politica,quantum,molduras,tempo_total,cpu_util,sobrecarga,ocioso,utilizacao_cpu,utilizacao_disco,utilizacao_terminal,throughput,trocas,referencias,faltas,taxa_faltas,acertos,erros_operacao,media_espera_threads,media_resposta_threads,media_retorno_processos
+politica-fcfs,mista,FCFS,3,4,70,54,13,3,0.771429,0.114286,0.057143,0.042857,13,6,6,1.000000,0,0,30.250000,17.750000,63.333333
+politica-rr,mista,RR,3,4,87,54,24,9,0.620690,0.091954,0.045977,0.034483,24,6,5,0.833333,1,0,42.000000,6.250000,69.000000
+politica-prioridade,mista,PRIORIDADE,3,4,75,54,12,9,0.720000,0.106667,0.053333,0.040000,12,6,5,0.833333,1,0,28.750000,15.000000,50.333333
+quantum-1,mista,RR,1,4,122,54,54,14,0.442623,0.065574,0.032787,0.024590,54,6,5,0.833333,1,0,69.000000,3.250000,95.666667
+quantum-6,mista,RR,6,4,76,54,15,7,0.710526,0.105263,0.052632,0.039474,15,6,5,0.833333,1,0,31.500000,10.000000,61.666667
+memoria-2,memoria,FCFS,3,2,65,10,10,45,0.153846,0.000000,0.000000,0.015385,10,9,9,1.000000,0,0,10.000000,1.000000,65.000000
+memoria-3,memoria,FCFS,3,3,29,10,4,15,0.344828,0.000000,0.000000,0.034483,4,9,3,0.333333,6,0,4.000000,1.000000,29.000000
