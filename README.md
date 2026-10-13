@@ -20,9 +20,7 @@ powershell -ExecutionPolicy Bypass -File scripts/abrir-interface.ps1
 
 ```
 
-Consulte `docs/interface-grafica.md`. Regere o pacote portátil para obter a GUI;
-
-o executável antigo continua sendo a versão anterior.
+Execute o comando na raiz do projeto, onde está este README. O script compila os fontes antes de abrir a interface. Para selecionar o JDK, consulte as instruções de Windows abaixo.
 
 ## DOOM clássico
 
@@ -30,7 +28,7 @@ O atalho **DOOM clássico** inicia Chocolate Doom em tela cheia no SO
 
 hospedeiro. Prepare o motor e seu IWAD uma vez, usando `scripts/preparar-doom.ps1`;
 
-o gerador inclui esses arquivos no pacote portátil. Veja **[docs/doom.md](docs/doom.md)**.
+o gerador inclui esses arquivos no pacote portátil. O motor e o IWAD são opcionais para executar o simulador de SO.
 
 O ZIP de fontes contém o lançador, não o motor nem o WAD. A partida não utiliza
 
@@ -68,21 +66,9 @@ somente o `.exe` nem o ZIP de fontes. Não é necessário instalar WiX para este
 
 formato `app-image`; não se está criando um instalador MSI.
 
-**Estado atual (19/09/2026):** o ZIP Windows/JDK 21 foi gerado neste ambiente.
+**Pendência do pacote portátil:** esta cópia não contém a pasta `docs/`, que o script de empacotamento tenta copiar. A geração do ZIP depende de restaurar essa documentação ou ajustar o script. Para executar os fontes, siga as instruções abaixo.
 
-Passaram 191 verificações do núcleo, o teste offscreen da interface e 10
-
-verificações do lançador DOOM. O executável empacotado concluiu a carga mista
-
-nas três políticas. O Chocolate Doom com `doom2.wad` permaneceu em execução
-
-por cinco segundos no teste de inicialização. Vídeo, teclado e áudio ainda
-
-precisam de conferência manual antes da entrega.
-
-Consulte `docs/entrega-portatil.md`. As instruções abaixo são para desenvolvimento
-
-e compilação do código-fonte, não para o professor que recebe o pacote pronto.
+### Desenvolvimento a partir dos fontes
 
 - JDK 21 ou superior com módulo `jdk.compiler`; não basta uma distribuição reduzida contendo apenas o runtime.
 
@@ -96,19 +82,31 @@ e compilação do código-fonte, não para o professor que recebe o pacote pront
 
 - Versão de compilação: `--release 21`, sem recursos preview. Classes compiladas para 21 não executam no Java 17.
 
-**Validação da migração:** a suíte e o pacote Windows foram executados com
-
-OpenJDK 21. Os sete experimentos também foram reproduzidos com JDK 21 em
-
-19/09/2026; os resultados e sua interpretação estão no
-
-[guia de apresentação](docs/guia-apresentacao.md) e em
-
-[experimentos-apresentacao.csv](docs/experimentos-apresentacao.csv).
-
-O relatório PDF preserva o registro histórico anterior.
-
 ### Windows / PowerShell
+
+Abra o PowerShell na raiz do projeto. Confira o Java selecionado e a presença do compilador:
+
+```powershell
+java -version
+java -m jdk.compiler/com.sun.tools.javac.Main --version
+```
+
+Ambos devem indicar versão 21 ou superior. Se aparecer Java 8/17 ou o módulo `jdk.compiler` não estiver disponível, selecione um JDK completo. Exemplo para a sessão atual do PowerShell (substitua pelo caminho real da instalação):
+
+```powershell
+$env:JAVA_HOME = 'C:\Java\jdk-21'
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+java -version
+java -m jdk.compiler/com.sun.tools.javac.Main --version
+```
+
+Para abrir a interface gráfica, execute:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/abrir-interface.ps1
+```
+
+Para compilar, executar uma carga pelo terminal e rodar os testes:
 
 ```powershell
 
@@ -138,6 +136,8 @@ java -cp build/classes so.Testes
 
 ### Linux / macOS
 
+Na raiz do projeto, com JDK 21 ou superior no `PATH`, execute:
+
 ```sh
 
 java -version
@@ -149,6 +149,10 @@ java -cp build/classes so.Main --carga cargas/mista.txt --politica RR --quantum 
 sh scripts/testar.sh
 
 ```
+
+Para abrir a interface gráfica no Linux/macOS, use `sh scripts/abrir-interface.sh` em uma sessão com ambiente gráfico.
+
+Os resultados da execução pelo terminal ficam em `resultados/minha-execucao`. Ao repetir o comando, escolha outro nome de pasta ou uma pasta vazia: o programa recusa diretórios com arquivos.
 
 Os scripts chamam o compilador pelo módulo padrão do JDK, equivalente a `javac`. O resultado esperado do teste é **`OK: 191 verificações aprovadas.`** e código de saída zero. Em seguida, `TestesInterface` confere a execução gráfica offscreen e a equivalência de métricas com a CLI. As verificações lançam `AssertionError` diretamente; não dependem de `-ea`. Os scripts devem ser executados a partir de uma cópia com as cargas originais.
 
@@ -326,9 +330,9 @@ python3 scripts/experimentos.py resultados/nova-comparacao
 
 ```
 
-No Windows, use `python` ou `py -3` em vez de `python3`. Escolha uma pasta inexistente. O script executa sete cenários: três políticas na carga mista, RR com quantum 1 e 6, e memória com 2 e 3 molduras. Todos usam troca 1, página 16, falta 5, disco 4, terminal 2 e semente 42. Os cenários de políticas usam quantum 3 e quatro molduras. Os cenários de quantum usam quatro molduras. Os cenários de memória usam FCFS e quantum 3 (sem efeito no FCFS).
+Compile o projeto antes de executar os experimentos. No Windows, use `python` ou `py -3` em vez de `python3`. Escolha uma pasta inexistente. O script executa sete cenários: três políticas na carga mista, RR com quantum 1 e 6, e memória com 2 e 3 molduras. Todos usam troca 1, página 16, falta 5, disco 4, terminal 2 e semente 42. Os cenários de políticas usam quantum 3 e quatro molduras. Os cenários de quantum usam quatro molduras. Os cenários de memória usam FCFS e quantum 3 (sem efeito no FCFS).
 
-Os logs/CSVs da execução de referência no JDK 17, quando disponíveis, ficam em `resultados/experimentos`. Resultados são ignorados pelo Git; o relatório registra os números necessários à comparação. A saída `comparacoes.csv` agrega as métricas e médias de cada cenário. Consulte `docs/relatorio-tecnico.pdf` para interpretação. O PDF registra uma migração antiga para JDK 27; o alvo desta entrega é JDK 21.
+Os logs e CSVs ficam na pasta escolhida. Resultados gerados são ignorados pelo Git. O arquivo `comparacoes.csv` agrega as métricas e médias de cada cenário.
 
 Sem Python, execute os comandos Java com a mesma matriz de parâmetros; por exemplo:
 
@@ -338,13 +342,9 @@ java -cp build/classes so.Main --carga cargas/memoria.txt --politica FCFS --troc
 
 ```
 
-### Regenerar o relatório (opcional)
-
-O PDF pronto acompanha o projeto. Para regenerá-lo após reproduzir os experimentos no diretório padrão, instale `reportlab` no ambiente Python e execute `python3 scripts/gerar_relatorio.py`. Essa biblioteca serve somente à documentação. O gerador incorpora DejaVu Sans se disponível em `/usr/share/fonts/truetype/dejavu` ou na pasta indicada pela variável `SO_FONT_DIR`; sem essas fontes usa Helvetica padrão.
-
 ## Arquitetura e manutenção
 
-Código em `src/so`, testes em `test/so`. Consulte `docs/arquitetura.md`, `docs/diagrama-classes.mmd`, `docs/requisitos.md` e `docs/relatorio-tecnico.pdf`.
+Código em `src/so`, testes em `test/so`. As responsabilidades principais são:
 
 - `InterfaceGrafica`, `LinhaTempo`: desktop Swing e projeção visual dos eventos.
 
@@ -376,4 +376,4 @@ O volume tem 128 blocos de 16 unidades UTF-16, encadeados; o tamanho lógico nã
 
 Fonte de requisitos: `Trabalho SO.pdf`, Prof. Maurício Acconcia Dias. Os algoritmos foram implementados a partir das definições do enunciado; não há biblioteca de núcleo de SO.
 
-A criação/publicação do repositório GitHub não foi realizada. O pacote está pronto para ser colocado em um repositório do grupo. `docs/progresso.md` é um registro técnico desta implementação. Antes da entrega, registre a participação real, confirme o acesso do professor e repita os comandos de compilação, teste e execução em seu ambiente.
+Antes da entrega, registre a participação real de cada integrante, confirme o acesso do professor ao repositório e repita os comandos de compilação, teste e execução em seu ambiente. O enunciado citado e os documentos da pasta `docs/` não estão incluídos nesta cópia.
