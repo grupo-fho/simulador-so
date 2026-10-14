@@ -376,4 +376,3 @@ O volume tem 128 blocos de 16 unidades UTF-16, encadeados; o tamanho lógico nã
 
 Fonte de requisitos: `Trabalho SO.pdf`, Prof. Maurício Acconcia Dias. Os algoritmos foram implementados a partir das definições do enunciado; não há biblioteca de núcleo de SO.
 
-Antes da entrega, registre a participação real de cada integrante, confirme o acesso do professor ao repositório e repita os comandos de compilação, teste e execução em seu ambiente. O enunciado citado e os documentos da pasta `docs/` não estão incluídos nesta cópia.
