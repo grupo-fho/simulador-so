@@ -11,11 +11,31 @@ record Metricas(long tempoTotal, long cpuUtil, long sobrecarga, long trocas, lon
     }
 
     String resumoCsv() {
-        return "tempo_total,cpu_util,sobrecarga,ocioso,utilizacao_cpu,utilizacao_disco,utilizacao_terminal,throughput,trocas,referencias,faltas,taxa_faltas,acertos,erros_operacao\n"
+        return "tempo_total,cpu_util,sobrecarga,ocioso,utilizacao_cpu,utilizacao_disco,utilizacao_terminal,throughput,trocas,referencias,faltas,taxa_faltas,acertos,erros_operacao,retorno_medio,espera_media,resposta_media\n"
                 + tempoTotal + "," + cpuUtil + "," + sobrecarga + "," + (tempoTotal - cpuUtil - sobrecarga) + ","
                 + razao(cpuUtil, tempoTotal) + "," + razao(discoOcupado, tempoTotal) + "," + razao(terminalOcupado, tempoTotal) + ","
                 + razao(processos.size(), tempoTotal) + "," + trocas + "," + referencias + "," + faltas + ","
-                + razao(faltas, referencias) + "," + acertos + "," + errosOperacao + "\n";
+                + razao(faltas, referencias) + "," + acertos + "," + errosOperacao + "," + mediasThreads() + "\n";
+    }
+
+    // Media por thread de retorno, espera e resposta, no formato r,e,p
+    private String mediasThreads() {
+        long retorno = 0; 
+        long espera = 0;
+        long resposta = 0;
+        long total = 0; 
+
+        for (Processo processo : processos) {
+            for (ThreadSimulada thread : processo.threads) {
+                retorno += thread.fim - processo.chegada;
+                espera += thread.espera;
+                resposta += thread.primeiraCpu - processo.chegada;
+
+                total++;
+            }
+        }
+
+        return razao(retorno, total) + "," + razao(espera, total) + "," + razao(resposta, total);
     }
 
     String threadsCsv() {

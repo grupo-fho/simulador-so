@@ -105,6 +105,7 @@ public final class Testes {
         verificar(primeiro.fim == 3 && segundo.fim == 5, "Finalizações FCFS");
         verificar(segundo.threads.get(0).espera == 2 && segundo.threads.get(0).primeiraCpu == 3, "Espera e resposta");
         verificar(simulador.metricas().resumoCsv().contains("1.000000,0.000000,0.000000,0.400000"), "Utilização e throughput");
+        verificar(simulador.metricas().resumoCsv().trim().endsWith("3.500000,1.000000,1.000000"), "Medias de retorno, espera e resposta");
     }
 
     private static void testarQuantum() {
