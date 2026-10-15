@@ -24,6 +24,7 @@ final class Simulador {
     private long sobrecarga;
     private long errosOperacao;
     private boolean iniciada;
+    private boolean concluida;
 
     Simulador(Configuracao configuracao, List<Processo> processos) {
         this.configuracao = configuracao;
@@ -46,16 +47,27 @@ final class Simulador {
         eventos.add(new Evento(instante, ordemTipo, sequenciaEvento++, acao));
     }
 
-    void simular() {
-        if (iniciada) { throw new IllegalStateException("Crie outro simulador para repetir a execução."); }
+    boolean concluida() { return concluida; }
+
+    // Inicializar não consome tempo nem admite processos antes do primeiro passo.
+    void iniciar() {
+        if (iniciada) { return; }
         iniciada = true;
         log("CONFIGURACAO", "sistema", configuracao.toString());
         log("MODELO", "sistema", "Prioridade não preemptiva; menor valor vence; semente registrada, sem aleatoriedade.");
         for (Processo processo : processos) {
             agendar(processo.chegada, 1, () -> admitir(processo));
         }
-        while (!eventos.isEmpty()) {
-            clock = eventos.peek().instante();
+    }
+
+    // Um passo resolve todos os eventos do próximo instante, inclusive trocas de custo zero.
+    // Sem novas chamadas, o clock e todo o estado permanecem parados.
+    boolean avancar() {
+        if (concluida) { return false; }
+        iniciar();
+        if (eventos.isEmpty()) { finalizar(); return false; }
+        clock = eventos.peek().instante();
+        do {
             // Conclusões externas (0), chegadas (1), CPU (2), fim de troca (3).
             while (!eventos.isEmpty() && eventos.peek().instante() == clock) {
                 eventos.remove().acao().run();
@@ -63,13 +75,36 @@ final class Simulador {
             if (executando == null && !trocandoContexto && escalonador.temProntos()) {
                 iniciarTroca();
             }
-        }
+        } while (!eventos.isEmpty() && eventos.peek().instante() == clock);
+        if (eventos.isEmpty()) { finalizar(); }
+        return true;
+    }
+
+    void simular() {
+        if (concluida) { throw new IllegalStateException("Crie outro simulador para repetir a execução."); }
+        while (avancar()) { /* O modo contínuo utiliza exatamente os mesmos passos. */ }
+    }
+
+    private void finalizar() {
         for (Processo processo : processos) {
             if (processo.estado() != Estado.FINALIZADO) {
                 throw new IllegalStateException("Simulação terminou com processo pendente: " + processo.id);
             }
         }
         log("FIM_SIMULACAO", "sistema", "Todos os processos e requisições concluídos.");
+        concluida = true;
+    }
+
+    String estadoThreadsCsv() {
+        StringBuilder texto = new StringBuilder("processo,thread,estado,pc,cpu,restante_surto\n");
+        for (Processo processo : processos) {
+            for (ThreadSimulada thread : processo.threads) {
+                texto.append(processo.id).append(',').append(thread.id).append(',').append(thread.estado())
+                        .append(',').append(thread.contadorPrograma).append(',').append(thread.cpu)
+                        .append(',').append(thread.restanteSurto).append('\n');
+            }
+        }
+        return texto.toString();
     }
 
     private void admitir(Processo processo) {

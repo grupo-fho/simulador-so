@@ -22,6 +22,23 @@ powershell -ExecutionPolicy Bypass -File scripts/abrir-interface.ps1
 
 Execute o comando na raiz do projeto, onde está este README. O script compila os fontes antes de abrir a interface. Para selecionar o JDK, consulte as instruções de Windows abaixo.
 
+### Execução passo a passo
+
+Na configuração, marque **Passo a passo** e clique em **Executar simulação**.
+O Monitor abre com a simulação pausada, mostrando o estado das threads, contador
+de programa (PC), CPU consumida, restante do surto e eventos.
+
+- **Próximo passo** processa o próximo instante com eventos. Eventos simultâneos
+  mantêm sua ordem original; trocas de contexto de custo zero são resolvidas no
+  mesmo passo. Intervalos ociosos podem fazer o clock saltar várias unidades.
+- **Continuar** avança automaticamente, com uma pausa visual de 200 ms entre passos.
+- **Pausar** interrompe esse avanço entre passos, preservando clock, quantum,
+  filas e contexto. A espera do usuário não conta no tempo simulado.
+
+Ao terminar, o Monitor apresenta as métricas finais e grava os mesmos logs e CSVs
+da execução contínua. Durante a sessão, inclusive pausada, outra execução fica
+bloqueada. Sem marcar a opção, permanece a execução completa original.
+
 ## DOOM clássico
 
 O atalho **DOOM clássico** inicia Chocolate Doom em tela cheia no SO
@@ -154,7 +171,7 @@ Para abrir a interface gráfica no Linux/macOS, use `sh scripts/abrir-interface.
 
 Os resultados da execução pelo terminal ficam em `resultados/minha-execucao`. Ao repetir o comando, escolha outro nome de pasta ou uma pasta vazia: o programa recusa diretórios com arquivos.
 
-Os scripts chamam o compilador pelo módulo padrão do JDK, equivalente a `javac`. O resultado esperado do teste é **`OK: 191 verificações aprovadas.`** e código de saída zero. Em seguida, `TestesInterface` confere a execução gráfica offscreen e a equivalência de métricas com a CLI. As verificações lançam `AssertionError` diretamente; não dependem de `-ea`. Os scripts devem ser executados a partir de uma cópia com as cargas originais.
+Os scripts chamam o compilador pelo módulo padrão do JDK, equivalente a `javac`. O resultado esperado do teste é **`OK: 530 verificações aprovadas.`** e código de saída zero. Em seguida, `TestesInterface` confere a execução gráfica offscreen, os controles de passo/pausa/retomada e a equivalência de métricas com a CLI. As verificações lançam `AssertionError` diretamente; não dependem de `-ea`. Os scripts devem ser executados a partir de uma cópia com as cargas originais.
 
 ## Parâmetros
 

@@ -22,6 +22,7 @@ public final class Testes {
         testarArquivos();
         testarCarga();
         testarIntegracao();
+        testarPassos();
         System.out.println("OK: " + aprovados + " verificações aprovadas.");
     }
 
@@ -219,6 +220,53 @@ public final class Testes {
                 verificar(recusada, "Carga inválida recusada");
             }
         } finally { Files.deleteIfExists(temporario); }
+    }
+
+    private static void testarPassos() throws IOException {
+        for (String carga : List.of("cpu", "io", "mista", "memoria", "arquivos", "threads-io", "verificacao", "erros-arquivos")) {
+            for (String politica : List.of("FCFS", "RR", "PRIORIDADE")) {
+                for (int troca : new int[]{0, 1}) {
+                    Configuracao config = configuracao(politica, 2, troca, 2);
+                    Path caminho = Path.of("cargas", carga + ".txt");
+                    Simulador continuo = new Simulador(config, Carga.ler(caminho));
+                    continuo.simular();
+                    Simulador passos = new Simulador(config, Carga.ler(caminho));
+                    passos.iniciar();
+                    passos.iniciar();
+                    verificar(passos.clock() == 0 && !passos.concluida(), "Inicialização sem avanço");
+                    verificar(objetos(passos, "CHEGADA").isEmpty(), "Processos aguardam primeiro passo");
+                    passos.avancar();
+                    long clockPausado = passos.clock();
+                    List<String> registroPausado = passos.registro();
+                    String estadoPausado = passos.estadoThreadsCsv();
+                    verificar(clockPausado == passos.clock() && registroPausado.equals(passos.registro())
+                            && estadoPausado.equals(passos.estadoThreadsCsv()), "Consulta durante pausa preserva estado");
+                    // Alterna execução manual e retomada contínua no mesmo objeto.
+                    if (politica.equals("RR")) { passos.simular(); }
+                    else { while (passos.avancar()) { } }
+                    verificar(passos.concluida(), "Conclusão em passos");
+                    verificar(continuo.registro().equals(passos.registro()), "Eventos equivalentes: " + carga + "/" + politica + "/" + troca);
+                    verificar(continuo.metricas().resumoCsv().equals(passos.metricas().resumoCsv())
+                            && continuo.metricas().threadsCsv().equals(passos.metricas().threadsCsv())
+                            && continuo.metricas().processosCsv().equals(passos.metricas().processosCsv()), "Todas as métricas equivalentes");
+                    verificar(!passos.avancar() && registroFinalUnico(passos), "Passo após conclusão não repete eventos");
+                }
+            }
+        }
+        Processo tardio = processo("Tardio", 7, 0, "CPU 2");
+        Simulador ocioso = new Simulador(configuracao("RR", 1, 0, 2), List.of(tardio));
+        ocioso.avancar();
+        verificar(ocioso.clock() == 7 && tardio.threads.getFirst().estado() == Estado.EXECUTANDO,
+                "Passo salta ociosidade e resolve despacho de custo zero no mesmo instante");
+        ocioso.avancar();
+        verificar(ocioso.clock() == 8 && tardio.threads.getFirst().cpu == 1
+                && objetos(ocioso, "PREEMPCAO").size() == 1, "Quantum preservado entre passos");
+        ocioso.simular();
+        verificar(ocioso.clock() == 9 && tardio.fim == 9, "Retomada preserva restante do surto");
+    }
+
+    private static boolean registroFinalUnico(Simulador simulador) {
+        return objetos(simulador, "FIM_SIMULACAO").size() == 1;
     }
 
     private static void testarIntegracao() throws IOException {

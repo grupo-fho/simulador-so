@@ -38,24 +38,37 @@ public final class Main {
 
     // Fluxo compartilhado pela CLI e pela interface; não encerra a JVM em caso de erro.
     static Simulador executar(Configuracao configuracao) throws IOException {
+        Simulador simulador = preparar(configuracao);
+        simulador.simular();
+        gravar(configuracao.saida(), simulador);
+        return simulador;
+    }
+
+    static Simulador preparar(Configuracao configuracao) throws IOException {
         List<Processo> processos = Carga.ler(configuracao.carga());
         validarEnderecos(processos, configuracao.pagina());
-        Path saida = configuracao.saida();
+        validarSaida(configuracao.saida());
+        return new Simulador(configuracao, processos);
+    }
+
+    private static void validarSaida(Path saida) throws IOException {
         if (Files.exists(saida)) {
             if (!Files.isDirectory(saida)) { throw new IllegalArgumentException("Saída não é um diretório: " + saida); }
             try (java.util.stream.Stream<Path> arquivos = Files.list(saida)) {
                 if (arquivos.findAny().isPresent()) { throw new IllegalArgumentException("Diretório de saída não está vazio: " + saida); }
             }
         }
-        Simulador simulador = new Simulador(configuracao, processos);
-        simulador.simular();
+    }
+
+    static void gravar(Path saida, Simulador simulador) throws IOException {
+        if (!simulador.concluida()) { throw new IllegalStateException("A simulação ainda não terminou."); }
+        validarSaida(saida);
         Files.createDirectories(saida);
         Metricas metricas = simulador.metricas();
         Files.write(saida.resolve("eventos.log"), simulador.registro(), StandardCharsets.UTF_8);
         Files.writeString(saida.resolve("resumo.csv"), metricas.resumoCsv(), StandardCharsets.UTF_8);
         Files.writeString(saida.resolve("threads.csv"), metricas.threadsCsv(), StandardCharsets.UTF_8);
         Files.writeString(saida.resolve("processos.csv"), metricas.processosCsv(), StandardCharsets.UTF_8);
-        return simulador;
     }
 
     static void validarEnderecos(List<Processo> processos, int tamanhoPagina) {

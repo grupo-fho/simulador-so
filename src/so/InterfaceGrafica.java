@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
@@ -43,6 +44,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
 /** Desktop didático: somente a apresentação usa threads reais (SwingWorker). */
@@ -58,6 +60,15 @@ public final class InterfaceGrafica {
     private final Map<String, JSpinner> parametros = new LinkedHashMap<>();
     private final JTextField semente = new JTextField("42");
     private final JButton executar = new JButton("▶  Executar simulação");
+    private final JCheckBox passoAPasso = new JCheckBox("Passo a passo");
+    private final JButton proximoPasso = new JButton("Próximo passo");
+    private final JButton continuar = new JButton("Continuar");
+    private final Timer temporizador = new Timer(200, evento -> avancarSimulacao());
+    private final JTextArea eventosAtuais = areaTexto("");
+    private final DefaultTableModel threadsAtuais = modeloTabela(
+            new String[]{"Processo", "Thread", "Estado", "PC", "CPU", "Restante do surto"});
+    private Simulador simulacaoAtual;
+    private Path saidaAtual;
     private final JLabel status = new JLabel(" Pronto • selecione uma carga e execute");
     private final JLabel clock = new JLabel(" Clock lógico: — ");
     private final JProgressBar progresso = new JProgressBar();
@@ -113,7 +124,21 @@ public final class InterfaceGrafica {
         criarAtalho("Resultados", "LOG", 360, this::abrirPasta);
         criarAtalho("DOOM clássico", "DOOM", 470, this::mostrarDoom);
         configurarFormulario();
-        resultados.setContentPane(abasResultados);
+        JPanel monitor = new JPanel(new BorderLayout());
+        JPanel controles = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        proximoPasso.setEnabled(false);
+        continuar.setEnabled(false);
+        proximoPasso.addActionListener(evento -> avancarSimulacao());
+        continuar.addActionListener(evento -> {
+            if (temporizador.isRunning()) { temporizador.stop(); }
+            else { temporizador.start(); }
+            atualizarControles();
+        });
+        controles.add(proximoPasso);
+        controles.add(continuar);
+        monitor.add(controles, BorderLayout.NORTH);
+        monitor.add(abasResultados, BorderLayout.CENTER);
+        resultados.setContentPane(monitor);
         JTextArea vazio = areaTexto("MONITOR DO SISTEMA\n\nExecute uma simulação para consultar:\n\n• Resumo de métricas\n• Processos e threads\n• Linha do tempo da CPU\n• Registro completo dos eventos\n\nOs resultados são calculados pelo mesmo núcleo da CLI.");
         abasResultados.addTab("Bem-vindo", new JScrollPane(vazio));
         desktop.add(configuracao);
@@ -223,7 +248,7 @@ public final class InterfaceGrafica {
         saida.add(botao("Alterar...", this::escolherSaida), BorderLayout.EAST);
         rodape.add(saida);
         JPanel acoes = new JPanel(new BorderLayout(8, 0));
-        acoes.add(new JLabel("Clock lógico • sem espera em tempo real"), BorderLayout.WEST);
+        acoes.add(passoAPasso, BorderLayout.WEST);
         executar.addActionListener(evento -> executarSimulacao());
         acoes.add(executar, BorderLayout.EAST);
         rodape.add(acoes);
@@ -277,6 +302,7 @@ public final class InterfaceGrafica {
 
     private void executarSimulacao() {
         if (ocupada) { return; }
+        boolean porPassos = passoAPasso.isSelected();
         List<String> argumentos = new ArrayList<>(List.of("--carga", carga.getText().strip(), "--politica",
                 politica.getSelectedItem().toString(), "--semente", semente.getText().strip()));
         Path pasta;
@@ -291,6 +317,7 @@ public final class InterfaceGrafica {
         } catch (IllegalArgumentException | java.text.ParseException erro) { informarErro(erro); return; }
         ocupada = true;
         executar.setEnabled(false);
+        passoAPasso.setEnabled(false);
         progresso.setIndeterminate(true);
         progresso.setString("Executando e gravando resultados...");
         status.setText(" Simulação em andamento");
@@ -302,30 +329,107 @@ public final class InterfaceGrafica {
                 Files.createDirectories(pasta);
                 saida = Files.createTempDirectory(pasta, "execucao-");
                 argumentos.addAll(List.of("--saida", saida.toString()));
-                return Main.executar(Configuracao.ler(argumentos.toArray(String[]::new)));
+                Configuracao configuracao = Configuracao.ler(argumentos.toArray(String[]::new));
+                return porPassos ? Main.preparar(configuracao) : Main.executar(configuracao);
             }
             @Override protected void done() {
-                ocupada = false;
-                executar.setEnabled(true);
                 progresso.setIndeterminate(false);
                 try {
                     Simulador simulador = get();
-                    ultimaSaida = saida;
-                    exibirResultados(simulador);
-                    progresso.setString("Concluído • resultados gravados");
-                    status.setText(" Concluído • clock " + simulador.clock());
-                    clock.setText(" Clock lógico: " + simulador.clock() + " ");
+                    if (porPassos) {
+                        simulacaoAtual = simulador;
+                        saidaAtual = saida;
+                        simulador.iniciar();
+                        abasResultados.removeAll();
+                        JTable tabela = configurarTabela(threadsAtuais);
+                        JScrollPane rolagem = new JScrollPane(tabela);
+                        rolagem.setColumnHeaderView(tabela.getTableHeader());
+                        abasResultados.addTab("Threads ao vivo", rolagem);
+                        abasResultados.addTab("Eventos ao vivo", new JScrollPane(eventosAtuais));
+                        atualizarExecucao();
+                        atualizarControles();
+                        mostrar(resultados);
+                    } else { concluirExecucao(simulador, saida); }
                 } catch (InterruptedException erro) {
                     Thread.currentThread().interrupt();
-                    progresso.setString("Interrompido");
-                    informarErro(erro);
+                    falharExecucao(erro);
                 } catch (ExecutionException erro) {
-                    progresso.setString("Falha • consulte a mensagem");
-                    status.setText(" Falha na execução");
-                    informarErro(erro.getCause());
+                    falharExecucao(erro.getCause());
                 }
             }
         }.execute();
+    }
+
+    private void avancarSimulacao() {
+        if (simulacaoAtual == null) { return; }
+        try {
+            simulacaoAtual.avancar();
+            atualizarExecucao();
+            if (simulacaoAtual.concluida()) {
+                temporizador.stop();
+                Simulador concluido = simulacaoAtual;
+                Path destino = saidaAtual;
+                simulacaoAtual = null;
+                atualizarControles();
+                progresso.setString("Gravando resultados...");
+                new SwingWorker<Void, Void>() {
+                    @Override protected Void doInBackground() throws IOException {
+                        Main.gravar(destino, concluido);
+                        return null;
+                    }
+                    @Override protected void done() {
+                        try { get(); concluirExecucao(concluido, destino); }
+                        catch (InterruptedException erro) {
+                            Thread.currentThread().interrupt();
+                            falharExecucao(erro);
+                        } catch (ExecutionException erro) { falharExecucao(erro.getCause()); }
+                    }
+                }.execute();
+            }
+        } catch (RuntimeException erro) { falharExecucao(erro); }
+    }
+
+    private void atualizarExecucao() {
+        clock.setText(" Clock lógico: " + simulacaoAtual.clock() + " ");
+        String[] linhas = simulacaoAtual.estadoThreadsCsv().strip().split("\n");
+        threadsAtuais.setRowCount(0);
+        for (int i = 1; i < linhas.length; i++) { threadsAtuais.addRow(linhas[i].split(",")); }
+        eventosAtuais.setText(String.join("\n", simulacaoAtual.registro()));
+    }
+
+    private void atualizarControles() {
+        boolean ativa = simulacaoAtual != null;
+        proximoPasso.setEnabled(ativa && !temporizador.isRunning());
+        continuar.setEnabled(ativa);
+        continuar.setText(temporizador.isRunning() ? "Pausar" : "Continuar");
+        if (ativa) {
+            String estado = temporizador.isRunning() ? "Em execução" : "Pausada • avance um passo ou continue";
+            progresso.setString(estado);
+            status.setText(" " + estado);
+        }
+    }
+
+    private void concluirExecucao(Simulador simulador, Path saida) {
+        ocupada = false;
+        executar.setEnabled(true);
+        passoAPasso.setEnabled(true);
+        ultimaSaida = saida;
+        exibirResultados(simulador);
+        progresso.setString("Concluído • resultados gravados");
+        status.setText(" Concluído • clock " + simulador.clock());
+        clock.setText(" Clock lógico: " + simulador.clock() + " ");
+    }
+
+    private void falharExecucao(Throwable erro) {
+        temporizador.stop();
+        simulacaoAtual = null;
+        atualizarControles();
+        ocupada = false;
+        executar.setEnabled(true);
+        passoAPasso.setEnabled(true);
+        progresso.setString("Falha • consulte a mensagem");
+        status.setText(" Falha na execução");
+        informarErro(erro);
     }
 
     private void exibirResultados(Simulador simulador) {
@@ -418,7 +522,9 @@ public final class InterfaceGrafica {
         JOptionPane.showMessageDialog(painel,
                 "1. Escolha uma carga ou use mista.txt.\n2. Ajuste a política e os parâmetros.\n3. Clique em Executar simulação.\n\n"
                 + "O Monitor mostra métricas, processos, threads, CPU e eventos.\nCada execução salva logs e CSVs em uma pasta nova.\n"
-                + "A linha do tempo representa a execução concluída; não é tempo real.\n\n"
+                + "Marque Passo a passo para acompanhar threads e eventos no Monitor.\n"
+                + "Próximo passo avança ao próximo instante com eventos. Continuar/Pausar controla o avanço automático.\n"
+                + "A pausa não consome tempo lógico. Os resultados são gravados ao concluir.\n\n"
                 + "Visual Frutiger Aero, com organização em janelas.\nNão é KDE nem Windows: é a interface do simulador.", "Ajuda do simulador", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -461,5 +567,6 @@ public final class InterfaceGrafica {
     // Acesso de pacote para conferir o desktop e as ações em testes sem uma janela nativa.
     JPanel painel() { return painel; }
     boolean ocupada() { return ocupada; }
+    long clockAtual() { return simulacaoAtual == null ? -1 : simulacaoAtual.clock(); }
     Path ultimaSaida() { return ultimaSaida; }
 }
