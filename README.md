@@ -166,8 +166,6 @@ As três têm CPU útil 5, horizonte 5, utilização 100% e throughput 0,4. A ca
 
 Veja [o guia de apresentação](docs/APRESENTACAO.md), [o diagrama](docs/ARQUITETURA.md) e [o relatório técnico](docs/RELATORIO.md). O PDF está em `docs/RELATORIO.pdf`.
 
-Para treinar a defesa e as alterações durante a apresentação, estão disponíveis [120 questões com alternativas A–E e gabarito comentado](docs/QUESTOES_ESTUDO.md), também em [formato DOCX](docs/QUESTOES_ESTUDO.docx). O caderno contém 53 questões com trechos de código, além de cálculos, conceitos, depuração e pedidos de modificação. As fontes e instruções de regeneração estão em [materiais/README.md](materiais/README.md).
 
 Limites deliberados: sem multiprocessamento, TLB, LRU, envelhecimento, SSTF, cache, journaling, persistência física ou interface gráfica. Estes recursos são opcionais no enunciado. Filas e blocos priorizam clareza didática; cargas muito grandes manterão muitos eventos de log em RAM.
 
-Fonte dos requisitos: `especificacoes.pdf`, Prof. Mauricio Acconcia Dias, disciplina de Sistemas Operacionais. Desenvolvimento assistido por OpenAI Codex. A solução deve ser estudada e a utilização da ferramenta informada conforme as regras da disciplina. A publicação em GitHub e o preenchimento dos nomes dos integrantes ficam a cargo do grupo; este projeto não cria repositório remoto nem inventa histórico de commits.
