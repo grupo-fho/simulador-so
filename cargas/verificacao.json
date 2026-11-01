@@ -1,0 +1,38 @@
+{
+  "processos": [
+    {
+      "id": "P1",
+      "chegada": 0,
+      "prioridade": 1,
+      "memoria": 256,
+      "threads": [
+        {
+          "id": "T1",
+          "instrucoes": [
+            {
+              "op": "cpu",
+              "duracao": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "chegada": 0,
+      "prioridade": 0,
+      "memoria": 256,
+      "threads": [
+        {
+          "id": "T1",
+          "instrucoes": [
+            {
+              "op": "cpu",
+              "duracao": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

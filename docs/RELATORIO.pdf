@@ -1,0 +1,315 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 6 /Kids [ 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R ] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 4244 >>
+stream
+0.12 0.18 0.24 rg
+BT /F2 14 Tf 45 777 Td (Simulador didático de sistemas operacionais) Tj ET
+BT /F1 10 Tf 45 751 Td (Relatório técnico da implementação em Python orientado a objetos.) Tj ET
+BT /F1 10 Tf 45 737 Td (Disciplina: Sistemas Operacionais. Professor: Mauricio Acconcia Dias.) Tj ET
+BT /F1 10 Tf 45 723 Td (Data da verificação: 31/10/2026. Ambiente: Windows, Python 3.14.) Tj ET
+BT /F1 10 Tf 45 709 Td (Integrantes: preencher pelo grupo antes da entrega acadêmica.) Tj ET
+BT /F2 12 Tf 45 680 Td (1. Objetivo e escopo) Tj ET
+BT /F1 10 Tf 45 654 Td (A aplicação reproduz mecanismos de um sistema operacional em um ambiente controlado: processos,) Tj ET
+BT /F1 10 Tf 45 640 Td (threads, escalonamento da CPU, paginação, entrada e saída e gerenciamento de arquivos. A) Tj ET
+BT /F1 10 Tf 45 626 Td (execução é por terminal. Processos e threads são objetos do modelo, sem criação de processos ou) Tj ET
+BT /F1 10 Tf 45 612 Td (threads reais para executar a carga.) Tj ET
+BT /F1 10 Tf 45 591 Td (A implementação segue o documento especificacoes.pdf até o gerenciamento de arquivos, incluindo) Tj ET
+BT /F1 10 Tf 45 577 Td (os registros, métricas, testes e experimentos necessários para observar os mecanismos. Os dados) Tj ET
+BT /F1 10 Tf 45 563 Td (dos arquivos virtuais, as tabelas e os registros de execução ficam exclusivamente em memória.) Tj ET
+BT /F1 10 Tf 45 549 Td (Não são criados arquivos de dados no computador hospedeiro.) Tj ET
+BT /F1 10 Tf 45 528 Td (As cargas JSON são entradas estáticas externas ao código, apenas lidas, como exige o enunciado.) Tj ET
+BT /F1 10 Tf 45 514 Td (Também existe entrada por stdin para fornecer uma carga sem criar arquivo adicional. A aplicação) Tj ET
+BT /F1 10 Tf 45 500 Td (não persiste resultados; imprime o log e as métricas no terminal. Documentação e este relatório) Tj ET
+BT /F1 10 Tf 45 486 Td (são artefatos da entrega, separados dos dados simulados.) Tj ET
+BT /F2 12 Tf 45 457 Td (2. Arquitetura orientada a objetos) Tj ET
+BT /F1 10 Tf 45 431 Td (Simulador coordena os mecanismos por composição. AgendaEventos mantém um heap de Evento,) Tj ET
+BT /F1 10 Tf 45 417 Td (ordenado pelo instante e pela sequência de inserção. RegistroEventos armazena o log em RAM.) Tj ET
+BT /F1 10 Tf 45 403 Td (Configuracao é um objeto imutável com validação de parâmetros. A interface e a leitura de) Tj ET
+BT /F1 10 Tf 45 389 Td (cenários ficam em módulos separados do núcleo.) Tj ET
+BT /F1 10 Tf 45 368 Td (Processo reúne um PCB e suas Threads. O PCB guarda identificador, prioridade, chegada, estado) Tj ET
+BT /F1 10 Tf 45 354 Td (agregado, recursos compartilhados, espaço lógico, IDs das threads, descritores e o último) Tj ET
+BT /F1 10 Tf 45 340 Td (contexto observado ao avançar uma instrução. Cada Thread possui um TCB com estado, PC,) Tj ET
+BT /F1 10 Tf 45 326 Td (registradores, pilha lógica, CPU restante e contadores necessários às métricas. A pilha lógica) Tj ET
+BT /F1 10 Tf 45 312 Td (registra o quadro de execução e as chamadas ao sistema de arquivos; não pretende representar a) Tj ET
+BT /F1 10 Tf 45 298 Td (pilha binária de uma arquitetura real.) Tj ET
+BT /F1 10 Tf 45 277 Td (Escalonador mantém a fila de prontos. PoliticaEscalonamento define uma interface abstrata de) Tj ET
+BT /F1 10 Tf 45 263 Td (seleção. FCFS seleciona a cabeça, RoundRobin reutiliza essa ordem e recebe limitação de quantum) Tj ET
+BT /F1 10 Tf 45 249 Td (no núcleo, e Prioridades seleciona o menor valor numérico. Essa separação permite modificar a) Tj ET
+BT /F1 10 Tf 45 235 Td (ordem sem alterar dispositivos ou arquivos. A herança fica restrita à relação entre políticas;) Tj ET
+BT /F1 10 Tf 45 221 Td (os recursos do SO usam composição.) Tj ET
+BT /F1 10 Tf 45 200 Td (GerenciadorMemoria administra tabelas e molduras. Dispositivo possui fila e conclusão por) Tj ET
+BT /F1 10 Tf 45 186 Td (evento. SistemaArquivos administra Diretorio, Arquivo, FCB, Bloco e ArquivoAberto. Não há uma) Tj ET
+BT /F1 10 Tf 45 172 Td (única classe que concentre toda a implementação. O diagrama de classes atualizado encontra-se em) Tj ET
+BT /F1 10 Tf 45 158 Td (docs/ARQUITETURA.md.) Tj ET
+BT /F2 12 Tf 45 129 Td (3. Clock, estados e decisões de execução) Tj ET
+BT /F1 8 Tf 45 28 Td (Simulador de SO | Relatorio tecnico | 1/6) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 4906 >>
+stream
+0.12 0.18 0.24 rg
+BT /F1 10 Tf 45 785 Td (O clock é lógico e começa em zero. O programa avança diretamente para o próximo evento, sem) Tj ET
+BT /F1 10 Tf 45 771 Td (aguardar tempo real. Eventos incluem chegada, fim de contexto, fim de intervalo CPU, interrupção) Tj ET
+BT /F1 10 Tf 45 757 Td (de E/S e carregamento de página. Todos os eventos de um instante são processados antes de um) Tj ET
+BT /F1 10 Tf 45 743 Td (novo despacho. Empates seguem a inserção na agenda; admissões seguem chegada e ID do processo,) Tj ET
+BT /F1 10 Tf 45 729 Td (com threads ordenadas por ID.) Tj ET
+BT /F1 10 Tf 45 708 Td (A thread percorre novo, pronto, executando, bloqueado e finalizado. As transições são validadas:) Tj ET
+BT /F1 10 Tf 45 694 Td (admissão coloca em pronto; despacho coloca em execução; preempção devolve à fila; falta ou E/S) Tj ET
+BT /F1 10 Tf 45 680 Td (bloqueante bloqueia; conclusão do serviço torna pronta; fim das instruções finaliza. Cada) Tj ET
+BT /F1 10 Tf 45 666 Td (mudança registra causa e clock. O estado do processo é derivado das suas threads, priorizando) Tj ET
+BT /F1 10 Tf 45 652 Td (executando, pronto e bloqueado. Todas finalizadas encerram o processo, liberam molduras e fecham) Tj ET
+BT /F1 10 Tf 45 638 Td (descritores.) Tj ET
+BT /F1 10 Tf 45 617 Td (Somente instruções cpu consomem CPU útil. Operações de controle, tradução, submissão de E/S e) Tj ET
+BT /F1 10 Tf 45 603 Td (chamadas de arquivo são instantâneas, enquanto suas latências configuráveis são tratadas por) Tj ET
+BT /F1 10 Tf 45 589 Td (eventos. Essa escolha deixa o cálculo verificável a mão e explicita quais tempos fazem parte do) Tj ET
+BT /F1 10 Tf 45 575 Td (modelo. A camada de arquivos não aciona automaticamente o dispositivo disco; a carga deve) Tj ET
+BT /F1 10 Tf 45 561 Td (informar es quando quiser representar essa latência.) Tj ET
+BT /F1 10 Tf 45 540 Td (Prioridades é não preemptiva. FCFS também conserva a CPU até bloqueio ou fim. RR limita CPU útil) Tj ET
+BT /F1 10 Tf 45 526 Td (por quantum, acumulando entre surtos adjacentes. Após o quantum, instruções instantâneas podem) Tj ET
+BT /F1 10 Tf 45 512 Td (terminar ou bloquear o programa; se houver mais CPU, a thread vai ao fim da fila. Uma chegada de) Tj ET
+BT /F1 10 Tf 45 498 Td (maior prioridade não interrompe a thread em execução.) Tj ET
+BT /F1 10 Tf 45 477 Td (Cada despacho conta como troca de contexto, inclusive o primeiro e a reeleição da mesma thread.) Tj ET
+BT /F1 10 Tf 45 463 Td (O custo é configurável. Nesse intervalo, não há execução útil. A espera de fila termina no) Tj ET
+BT /F1 10 Tf 45 449 Td (despacho; por isso o custo afeta resposta e retorno, mas não é incorporado artificialmente à) Tj ET
+BT /F1 10 Tf 45 435 Td (espera. CPU restante, PC e registradores permanecem no TCB durante preempções e bloqueios.) Tj ET
+BT /F2 12 Tf 45 406 Td (4. Paginação e entrada e saída) Tj ET
+BT /F1 10 Tf 45 380 Td (Cada processo tem espaço de endereçamento independente, com tabela de páginas indicando presença) Tj ET
+BT /F1 10 Tf 45 366 Td (e moldura. A tradução usa pagina = endereco // tamanho_pagina, deslocamento = endereco %) Tj ET
+BT /F1 10 Tf 45 352 Td (tamanho_pagina e fisico = moldura * tamanho_pagina + deslocamento. Endereços fora do espaço) Tj ET
+BT /F1 10 Tf 45 338 Td (lógico são rejeitados antes da execução da carga.) Tj ET
+BT /F1 10 Tf 45 317 Td (Um acesso residente é acerto. Um acesso não residente conta uma falta e bloqueia a thread. Um) Tj ET
+BT /F1 10 Tf 45 303 Td (paginador serial atende em FCFS com tempo configurável, independente dos dispositivos. Na) Tj ET
+BT /F1 10 Tf 45 289 Td (conclusão, usa moldura livre ou remove a página de carregamento mais antigo, em FIFO global.) Tj ET
+BT /F1 10 Tf 45 275 Td (Acertos não atualizam a ordem. A tabela da vítima é invalidada e a nova associação fica) Tj ET
+BT /F1 10 Tf 45 261 Td (registrada.) Tj ET
+BT /F1 10 Tf 45 240 Td (Faltas simultâneas para a mesma página do mesmo processo compartilham um carregamento. Cada) Tj ET
+BT /F1 10 Tf 45 226 Td (referência ausente continua contando uma falta, portanto faltas e carregamentos não são) Tj ET
+BT /F1 10 Tf 45 212 Td (necessariamente iguais. A referência pendente é concluída no carregamento; a thread não precisa) Tj ET
+BT /F1 10 Tf 45 198 Td (repeti-la no despacho seguinte. Assim, uma substituição intermediária não cria tentativas) Tj ET
+BT /F1 10 Tf 45 184 Td (artificiais nem impede o progresso com poucas molduras.) Tj ET
+BT /F1 10 Tf 45 163 Td (Há dispositivo de bloco, disco, e de caractere, terminal. Cada um tem sua fila FCFS, estado de) Tj ET
+BT /F1 10 Tf 45 149 Td (atendimento, serviço e métricas. Uma solicitação bloqueante libera a CPU; a conclusão produz) Tj ET
+BT /F1 10 Tf 45 135 Td (interrupção e retorno à fila de prontos. Outra thread do mesmo processo pode executar durante o) Tj ET
+BT /F1 10 Tf 45 121 Td (bloqueio.) Tj ET
+BT /F1 8 Tf 45 28 Td (Simulador de SO | Relatorio tecnico | 2/6) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 4579 >>
+stream
+0.12 0.18 0.24 rg
+BT /F1 10 Tf 45 785 Td (E/S não bloqueante devolve o controle imediatamente. Ao terminar, entrega notificação no TCB e) Tj ET
+BT /F1 10 Tf 45 771 Td (registra es_N como concluida. Não há espera ativa. Solicitações pendentes continuam até) Tj ET
+BT /F1 10 Tf 45 757 Td (concluir, mesmo se a thread já finalizou. O horizonte global da execução inclui essa drenagem,) Tj ET
+BT /F1 10 Tf 45 743 Td (distinguindo-se do retorno individual dos processos.) Tj ET
+BT /F2 12 Tf 45 714 Td (5. Sistema de arquivos em memória) Tj ET
+BT /F1 10 Tf 45 688 Td (A raiz contém diretórios e arquivos. Cada objeto tem FCB com ID, nome, tipo, tamanho,) Tj ET
+BT /F1 10 Tf 45 674 Td (permissões, criação, modificação e primeiro bloco. Diretórios mantêm entradas por nome; arquivos) Tj ET
+BT /F1 10 Tf 45 660 Td (guardam conteúdo em blocos de tamanho fixo, ligados pelo campo proximo. Diretórios não consomem) Tj ET
+BT /F1 10 Tf 45 646 Td (os blocos reservados ao conteúdo dos arquivos.) Tj ET
+BT /F1 10 Tf 45 625 Td (O sistema oferece criar diretório e arquivo, abrir, ler, escrever, fechar, remover e listar. A) Tj ET
+BT /F1 10 Tf 45 611 Td (abertura retorna descritor local ao processo e cria entrada na tabela global com referência ao) Tj ET
+BT /F1 10 Tf 45 597 Td (arquivo, modo e cursor. Diferentes processos podem ter descritor zero apontando para aberturas) Tj ET
+BT /F1 10 Tf 45 583 Td (distintas. Cada abertura mantém seu cursor; threads do mesmo processo compartilham a tabela de) Tj ET
+BT /F1 10 Tf 45 569 Td (descritores.) Tj ET
+BT /F1 10 Tf 45 548 Td (Os modos são r, w, rw e a. w trunca na abertura; rw preserva conteúdo; a escreve ao final.) Tj ET
+BT /F1 10 Tf 45 534 Td (Conteúdo é codificado em UTF-8, e tamanho e cursor são medidos em bytes. Permissões básicas r/w) Tj ET
+BT /F1 10 Tf 45 520 Td (são verificadas na abertura e no uso; diretórios controlam travessia/listagem e alteração de) Tj ET
+BT /F1 10 Tf 45 506 Td (entradas. Não há usuários ou grupos.) Tj ET
+BT /F1 10 Tf 45 485 Td (São recusados descritores fechados, acesso incompatível, caminhos inexistentes, remoção de) Tj ET
+BT /F1 10 Tf 45 471 Td (arquivo aberto e de diretório não vazio. Falta de espaço é verificada antes da alteração: uma) Tj ET
+BT /F1 10 Tf 45 457 Td (escrita recusada preserva dados e cursor. Erros das chamadas simuladas são registrados e) Tj ET
+BT /F1 10 Tf 45 443 Td (retornam no registrador erro_arquivo; não interrompem o núcleo.) Tj ET
+BT /F1 10 Tf 45 422 Td (A alocação encadeada permite aproveitar blocos livres não contíguos. Sua limitação é a) Tj ET
+BT /F1 10 Tf 45 408 Td (necessidade de percorrer a cadeia para acessar conteúdo e o custo adicional dos elos. Esta) Tj ET
+BT /F1 10 Tf 45 394 Td (implementação recompõe os dados em RAM ao escrever, favorecendo clareza em vez de eficiência) Tj ET
+BT /F1 10 Tf 45 380 Td (para arquivos extensos. Não há cache, journaling ou persistência física.) Tj ET
+BT /F2 12 Tf 45 351 Td (6. Métricas e metodologia) Tj ET
+BT /F1 10 Tf 45 325 Td (Retorno é finalização menos chegada. Espera soma os intervalos na fila de prontos. Resposta vai) Tj ET
+BT /F1 10 Tf 45 311 Td (da chegada à primeira CPU útil; sem CPU, é indefinida e apresentada como n/a. A espera do) Tj ET
+BT /F1 10 Tf 45 297 Td (processo é explicitamente a soma das esperas das threads; sua resposta usa a primeira execução) Tj ET
+BT /F1 10 Tf 45 283 Td (útil entre elas.) Tj ET
+BT /F1 10 Tf 45 262 Td (Utilização da CPU é CPU útil dividida pelo horizonte global. A sobrecarga é informada) Tj ET
+BT /F1 10 Tf 45 248 Td (separadamente; ociosidade é o restante do horizonte. Utilização de dispositivo considera apenas) Tj ET
+BT /F1 10 Tf 45 234 Td (serviço, sem tempo de fila. Throughput mede processos finalizados por unidade de tempo global.) Tj ET
+BT /F1 10 Tf 45 220 Td (Taxa de faltas divide referências não residentes pelo total de referências. As razões usam zero) Tj ET
+BT /F1 10 Tf 45 206 Td (quando o denominador é zero.) Tj ET
+BT /F1 10 Tf 45 185 Td (Os experimentos são reproduzidos por python main.py --experimentos. Cada rodada reconstrói todos) Tj ET
+BT /F1 10 Tf 45 171 Td (os objetos e imprime a configuração completa. Não há sorteio nas cargas; a semente 42 é) Tj ET
+BT /F1 10 Tf 45 157 Td (registrada. Comparações internas mantêm as variáveis constantes, mudando somente o fator) Tj ET
+BT /F1 10 Tf 45 143 Td (indicado. As três comparações usam cenários diferentes e seus valores absolutos não devem ser) Tj ET
+BT /F1 10 Tf 45 129 Td (comparados como se fossem uma única carga.) Tj ET
+BT /F1 8 Tf 45 28 Td (Simulador de SO | Relatorio tecnico | 3/6) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 5465 >>
+stream
+0.12 0.18 0.24 rg
+BT /F2 12 Tf 45 777 Td (7. Experimento 1: políticas na mesma carga) Tj ET
+BT /F1 10 Tf 45 751 Td (Carga mista: três processos, quatro threads, 22 unidades de CPU útil, cinco referências de) Tj ET
+BT /F1 10 Tf 45 737 Td (memória, E/S de disco e terminal. Configuração: quantum 2, contexto 0, página 16 bytes, três) Tj ET
+BT /F1 10 Tf 45 723 Td (molduras, falta 3, disco 4, terminal 2; demais capacidades padrão.) Tj ET
+BT /F3 7.5 Tf 45 702 Td (+-------------+-----------+--------------+-----------+---------------------+-----------------------+) Tj ET
+BT /F3 7.5 Tf 45 690 Td (| Política    | Horizonte | CPU útil \(%\) | Despachos | Espera média/thread | Resposta média/thread |) Tj ET
+BT /F3 7.5 Tf 45 678 Td (+-------------+-----------+--------------+-----------+---------------------+-----------------------+) Tj ET
+BT /F3 7.5 Tf 45 666 Td (| FCFS        | 26        | 84,62        | 11        | 6,00                | 6,50                  |) Tj ET
+BT /F3 7.5 Tf 45 654 Td (| RR q=2      | 27        | 81,48        | 17        | 8,75                | 3,75                  |) Tj ET
+BT /F3 7.5 Tf 45 642 Td (| Prioridades | 28        | 78,57        | 11        | 6,00                | 6,50                  |) Tj ET
+BT /F3 7.5 Tf 45 630 Td (+-------------+-----------+--------------+-----------+---------------------+-----------------------+) Tj ET
+BT /F1 10 Tf 45 611 Td (Todas as políticas registraram cinco faltas de página. RR antecipou a primeira CPU de threads) Tj ET
+BT /F1 10 Tf 45 597 Td (que aguardariam surtos maiores, reduzindo resposta média de 6,50 para 3,75. Isso não reduziu) Tj ET
+BT /F1 10 Tf 45 583 Td (espera total: a rotação e as interações com bloqueios aumentaram a espera média nesta carga.) Tj ET
+BT /F1 10 Tf 45 562 Td (Mesmo com contexto gratuito e CPU útil idêntica, os horizontes diferem. A ordem de execução muda) Tj ET
+BT /F1 10 Tf 45 548 Td (o instante das solicitações, o aproveitamento do paralelismo lógico entre CPU/dispositivos e a) Tj ET
+BT /F1 10 Tf 45 534 Td (existência de períodos ociosos. Prioridades não trouxe o menor tempo global. Esses resultados) Tj ET
+BT /F1 10 Tf 45 520 Td (descrevem este cenário, sem estabelecer uma política universalmente melhor.) Tj ET
+BT /F2 12 Tf 45 491 Td (8. Experimento 2: efeito do quantum) Tj ET
+BT /F1 10 Tf 45 465 Td (Carga cpu: três processos, surtos de 12, 5 e 8, chegadas em 0, 1 e 2. RR nas duas rodadas, custo) Tj ET
+BT /F1 10 Tf 45 451 Td (por contexto 1; apenas o quantum muda. Não há E/S ou memória; CPU útil total permanece 25.) Tj ET
+BT /F3 7.5 Tf 45 430 Td (+---------+-----------+-----------+------------+--------------+-----------------------+) Tj ET
+BT /F3 7.5 Tf 45 418 Td (| Quantum | Horizonte | Despachos | Sobrecarga | CPU útil \(%\) | Resposta média/thread |) Tj ET
+BT /F3 7.5 Tf 45 406 Td (+---------+-----------+-----------+------------+--------------+-----------------------+) Tj ET
+BT /F3 7.5 Tf 45 394 Td (| 1       | 50        | 25        | 25         | 50,00        | 2,00                  |) Tj ET
+BT /F3 7.5 Tf 45 382 Td (| 4       | 32        | 7         | 7          | 78,13        | 5,00                  |) Tj ET
+BT /F3 7.5 Tf 45 370 Td (+---------+-----------+-----------+------------+--------------+-----------------------+) Tj ET
+BT /F1 10 Tf 45 351 Td (Quantum pequeno permite resposta inicial mais rápida, mas realiza 25 despachos e gasta metade do) Tj ET
+BT /F1 10 Tf 45 337 Td (horizonte em contexto. Quantum 4 reduz 18 despachos, levando a sobrecarga de 25 para 7 e o) Tj ET
+BT /F1 10 Tf 45 323 Td (horizonte de 50 para 32. Em troca, a resposta média cresce de 2 para 5. A comparação mostra o) Tj ET
+BT /F1 10 Tf 45 309 Td (compromisso entre interatividade e aproveitamento da CPU quando a troca tem custo.) Tj ET
+BT /F2 12 Tf 45 280 Td (9. Experimento 3: capacidade da memória) Tj ET
+BT /F1 10 Tf 45 254 Td (Carga memoria: um processo, uma thread, sequência de páginas 0, 1, 2, 0, 1, 2, 3, 0, 1, 2, 3.) Tj ET
+BT /F1 10 Tf 45 240 Td (Após cada referência há uma unidade de CPU, totalizando 11. FIFO, página 16, serviço 3, RR q=2 e) Tj ET
+BT /F1 10 Tf 45 226 Td (contexto 0. Apenas o número de molduras muda.) Tj ET
+BT /F3 7.5 Tf 45 205 Td (+----------+-------------+--------+---------+-----------+--------------+) Tj ET
+BT /F3 7.5 Tf 45 193 Td (| Molduras | Referências | Faltas | Acertos | Horizonte | CPU útil \(%\) |) Tj ET
+BT /F3 7.5 Tf 45 181 Td (+----------+-------------+--------+---------+-----------+--------------+) Tj ET
+BT /F3 7.5 Tf 45 169 Td (| 2        | 11          | 11     | 0       | 44        | 25,00        |) Tj ET
+BT /F3 7.5 Tf 45 157 Td (| 4        | 11          | 4      | 7       | 23        | 47,83        |) Tj ET
+BT /F3 7.5 Tf 45 145 Td (+----------+-------------+--------+---------+-----------+--------------+) Tj ET
+BT /F1 10 Tf 45 126 Td (Com duas molduras, a alternância remove páginas antes de sua reutilização e toda referência) Tj ET
+BT /F1 10 Tf 45 112 Td (falta. O tempo é 11 + 11 x 3 = 44. Quatro molduras acomodam as quatro páginas: apenas os) Tj ET
+BT /F1 10 Tf 45 98 Td (primeiros acessos faltam, dando 11 + 4 x 3 = 23. A redução de sete faltas elimina 21 unidades de) Tj ET
+BT /F1 10 Tf 45 84 Td (bloqueio. CPU útil não mudou; sua proporção cresce porque o horizonte diminui. Isso não prova) Tj ET
+BT /F1 10 Tf 45 70 Td (monotonicidade geral de FIFO, que pode apresentar anomalias em outras sequências.) Tj ET
+BT /F1 8 Tf 45 28 Td (Simulador de SO | Relatorio tecnico | 4/6) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 15 0 R >>
+endobj
+15 0 obj
+<< /Length 4513 >>
+stream
+0.12 0.18 0.24 rg
+BT /F2 12 Tf 45 770 Td (10. Verificação e cargas de demonstração) Tj ET
+BT /F1 10 Tf 45 744 Td (Foram executados 32 testes automatizados com unittest, todos aprovados. O comando é python -B -m) Tj ET
+BT /F1 10 Tf 45 730 Td (unittest discover -s testes -v. A integração executa seis cargas nas três políticas, verificando) Tj ET
+BT /F1 10 Tf 45 716 Td (finalização, limpeza das aberturas, monotonicidade do log e conservação entre CPU útil, contexto) Tj ET
+BT /F1 10 Tf 45 702 Td (e ociosidade.) Tj ET
+BT /F1 10 Tf 45 681 Td (Os testes incluem ordenação estável de eventos, prioridades não preemptivas, quantum acumulado,) Tj ET
+BT /F1 10 Tf 45 667 Td (métricas conferíveis manualmente, preservação de contexto, tradução, FIFO distinto de LRU, falta) Tj ET
+BT /F1 10 Tf 45 653 Td (compartilhada, moldura única entre processos, E/S independente por dispositivo, notificação) Tj ET
+BT /F1 10 Tf 45 639 Td (assíncrona, descritores locais, permissões, remoção, truncamento, UTF-8 e disco cheio sem) Tj ET
+BT /F1 10 Tf 45 625 Td (corrupção. Há teste de repetição integral de log e métricas.) Tj ET
+BT /F1 10 Tf 45 604 Td (Um teste bloqueia builtins.open e io.open durante a simulação de arquivos, comprovando que as) Tj ET
+BT /F1 10 Tf 45 590 Td (operações virtuais não dependem do sistema de arquivos hospedeiro. A leitura inicial da carga) Tj ET
+BT /F1 10 Tf 45 576 Td (ocorre antes desse bloqueio, por ser entrada estática autorizada.) Tj ET
+BT /F1 10 Tf 45 555 Td (A carga verificacao permite conferência manual: P1 CPU 3 e P2 CPU 2, chegadas zero. FCFS termina) Tj ET
+BT /F1 10 Tf 45 541 Td (P1 em 3 e P2 em 5. RR q=2 termina P2 em 4 e P1 em 5. Prioridades executa P2 primeiro, terminando) Tj ET
+BT /F1 10 Tf 45 527 Td (em 2 e P1 em 5. O horizonte é 5 nas três políticas sem custo de contexto.) Tj ET
+BT /F1 10 Tf 45 506 Td (A carga arquivos demonstra todas as operações e três falhas intencionais: leitura após) Tj ET
+BT /F1 10 Tf 45 492 Td (fechamento, abertura para escrita sem permissão e remoção de caminho inexistente. A contagem) Tj ET
+BT /F1 10 Tf 45 478 Td (esperada é três erros simulados, sem falha do programa. As cargas cpu, es e mista atendem aos) Tj ET
+BT /F1 10 Tf 45 464 Td (perfis mínimos solicitados.) Tj ET
+BT /F2 12 Tf 45 435 Td (11. Limitações e materiais da entrega) Tj ET
+BT /F1 10 Tf 45 409 Td (O modelo tem uma CPU lógica, prioridades sem envelhecimento, paginação FIFO global e paginador) Tj ET
+BT /F1 10 Tf 45 395 Td (próprio. Instruções de controle e chamadas de arquivo não gastam CPU útil. Não modela proteção) Tj ET
+BT /F1 10 Tf 45 381 Td (por usuário, memória contígua, multiprocessamento, TLB, LRU, escalonamento de disco avançado,) Tj ET
+BT /F1 10 Tf 45 367 Td (cache ou journaling. Esses limites estão documentados e os recursos opcionais não são declarados) Tj ET
+BT /F1 10 Tf 45 353 Td (como implementados.) Tj ET
+BT /F1 10 Tf 45 332 Td (Todos os eventos ficam em RAM; cenários extensos podem consumir memória considerável. A tabela) Tj ET
+BT /F1 10 Tf 45 318 Td (de blocos é pequena e usa varredura por clareza didática. Leituras parciais podem dividir) Tj ET
+BT /F1 10 Tf 45 304 Td (caracteres UTF-8 na exibição; os bytes do arquivo permanecem corretos. Métricas de E/S usam o) Tj ET
+BT /F1 10 Tf 45 290 Td (horizonte que inclui solicitações assíncronas após o fim dos processos.) Tj ET
+BT /F1 10 Tf 45 269 Td (A entrega contém código-fonte, seis cenários JSON, testes, README, diagrama, guia de) Tj ET
+BT /F1 10 Tf 45 255 Td (apresentação e relatório em Markdown/PDF. A publicação no GitHub, identificação dos integrantes) Tj ET
+BT /F1 10 Tf 45 241 Td (e formação do histórico real de participação devem ser feitas pelo grupo; não foram criados) Tj ET
+BT /F1 10 Tf 45 227 Td (repositório remoto nem commits artificiais.) Tj ET
+BT /F2 12 Tf 45 198 Td (12. Fontes e ferramentas) Tj ET
+BT /F1 10 Tf 45 172 Td (Fonte dos requisitos: especificacoes.pdf, Especificação do trabalho prático: Simulador didático) Tj ET
+BT /F1 10 Tf 45 158 Td (de sistemas operacionais, Prof. Mauricio Acconcia Dias, fornecido junto ao projeto.) Tj ET
+BT /F1 10 Tf 45 137 Td (Bibliotecas utilizadas: biblioteca padrão Python, principalmente dataclasses, enum, abc, heapq,) Tj ET
+BT /F1 10 Tf 45 123 Td (collections, itertools, json, argparse, pathlib e unittest. Não foram utilizadas bibliotecas que) Tj ET
+BT /F1 10 Tf 45 109 Td (implementam escalonamento, paginação ou sistema de arquivos do simulador.) Tj ET
+BT /F1 8 Tf 45 28 Td (Simulador de SO | Relatorio tecnico | 5/6) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 17 0 R >>
+endobj
+17 0 obj
+<< /Length 542 >>
+stream
+0.12 0.18 0.24 rg
+BT /F1 10 Tf 45 785 Td (O desenvolvimento foi assistido por OpenAI Codex. A leitura do PDF usou reconhecimento de texto) Tj ET
+BT /F1 10 Tf 45 771 Td (do Windows como ferramenta de apoio; o programa entregue não depende dele. O grupo deve) Tj ET
+BT /F1 10 Tf 45 757 Td (identificar essa assistência conforme as regras da disciplina e compreender as decisões, os) Tj ET
+BT /F1 10 Tf 45 743 Td (testes e as limitações antes de apresentar a solução.) Tj ET
+BT /F1 8 Tf 45 28 Td (Simulador de SO | Relatorio tecnico | 6/6) Tj ET
+endstream
+endobj
+xref
+0 18
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000157 00000 n 
+0000000254 00000 n 
+0000000356 00000 n 
+0000000451 00000 n 
+0000000597 00000 n 
+0000004893 00000 n 
+0000005039 00000 n 
+0000009997 00000 n 
+0000010145 00000 n 
+0000014777 00000 n 
+0000014925 00000 n 
+0000020443 00000 n 
+0000020591 00000 n 
+0000025157 00000 n 
+0000025305 00000 n 
+trailer
+<< /Size 18 /Root 1 0 R >>
+startxref
+25899
+%%EOF

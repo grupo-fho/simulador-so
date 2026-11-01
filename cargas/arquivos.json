@@ -1,0 +1,100 @@
+{
+  "processos": [
+    {
+      "id": "P1",
+      "chegada": 0,
+      "prioridade": 0,
+      "memoria": 256,
+      "threads": [
+        {
+          "id": "T1",
+          "instrucoes": [
+            {
+              "op": "cpu",
+              "duracao": 1
+            },
+            {
+              "op": "criar_diretorio",
+              "caminho": "/aula"
+            },
+            {
+              "op": "criar_arquivo",
+              "caminho": "/aula/notas"
+            },
+            {
+              "op": "abrir",
+              "caminho": "/aula/notas",
+              "modo": "rw",
+              "salvar_em": "notas"
+            },
+            {
+              "op": "escrever",
+              "fd": "notas",
+              "texto": "SO em memoria: nenhum arquivo real!"
+            },
+            {
+              "op": "fechar",
+              "fd": "notas"
+            },
+            {
+              "op": "abrir",
+              "caminho": "/aula/notas",
+              "modo": "r",
+              "salvar_em": "leitura"
+            },
+            {
+              "op": "ler",
+              "fd": "leitura"
+            },
+            {
+              "op": "listar",
+              "caminho": "/aula"
+            },
+            {
+              "op": "fechar",
+              "fd": "leitura"
+            },
+            {
+              "op": "ler",
+              "fd": "leitura"
+            },
+            {
+              "op": "criar_arquivo",
+              "caminho": "/aula/protegido",
+              "permissoes": "r"
+            },
+            {
+              "op": "abrir",
+              "caminho": "/aula/protegido",
+              "modo": "w"
+            },
+            {
+              "op": "remover",
+              "caminho": "/inexistente"
+            },
+            {
+              "op": "remover",
+              "caminho": "/aula/notas"
+            },
+            {
+              "op": "remover",
+              "caminho": "/aula/protegido"
+            },
+            {
+              "op": "remover",
+              "caminho": "/aula"
+            },
+            {
+              "op": "listar",
+              "caminho": "/"
+            },
+            {
+              "op": "cpu",
+              "duracao": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

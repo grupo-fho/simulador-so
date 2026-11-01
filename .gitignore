@@ -1,10 +1,5 @@
-build/
-dist/
-resultados/
-*.class
-*.log
-*.tmp
-
-# Dependencias e dados do jogo preparados localmente
-jogos/doom/*
-!jogos/doom/LEIA-ME.txt
+__pycache__/
+*.py[cod]
+.venv/
+.ferramentas/
+.pytest_cache/

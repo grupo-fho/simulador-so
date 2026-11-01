@@ -1,0 +1,55 @@
+{
+  "processos": [
+    {
+      "id": "P1",
+      "chegada": 0,
+      "prioridade": 2,
+      "memoria": 256,
+      "threads": [
+        {
+          "id": "T1",
+          "instrucoes": [
+            {
+              "op": "cpu",
+              "duracao": 12
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "chegada": 1,
+      "prioridade": 0,
+      "memoria": 256,
+      "threads": [
+        {
+          "id": "T1",
+          "instrucoes": [
+            {
+              "op": "cpu",
+              "duracao": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "chegada": 2,
+      "prioridade": 1,
+      "memoria": 256,
+      "threads": [
+        {
+          "id": "T1",
+          "instrucoes": [
+            {
+              "op": "cpu",
+              "duracao": 8
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
