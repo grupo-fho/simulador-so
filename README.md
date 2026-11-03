@@ -121,6 +121,15 @@ Modos: r lê; w escreve e trunca na abertura; rw lê/escreve preservando o conte
 - O estado do processo é agregado: executando se alguma thread executa, pronto se alguma está pronta, bloqueado se só restam bloqueadas/finalizadas, finalizado quando todas terminam. Todos os estados e causas aparecem no log. No fim do processo, fecha descritores e libera molduras; o arquivo virtual permanece até remoção explícita ou encerramento da aplicação.
 - Blocos de tamanho fixo são ligados por `proximo`; o FCB aponta para o primeiro. Diretórios guardam entradas em memória e não consomem os blocos destinados ao conteúdo dos arquivos.
 
+## Decisões Arquiteturais
+
+- **Escalonamento por Prioridades:** Implementado na modalidade **não preemptiva**. Processos de maior prioridade entram na frente da fila de prontos, mas não interrompem a thread que já está ocupando a CPU.
+- **Gerenciamento de Memória:** Paginado com tamanho de moldura fixo e substituição **FIFO Global**. A vítima é escolhida na conclusão do carregamento, e faltas simultâneas na mesma página compartilham o atendimento.
+- **Alocação no Sistema de Arquivos:** **Alocação Encadeada** por blocos de tamanho fixo (`proximo`). 
+  - *Vantagem:* Elimina a fragmentação externa e permite crescimento dinâmico dos arquivos.
+  - *Limitação:* O acesso aleatório aos dados exige o encadeamento dos blocos a partir do primeiro apontado pelo FCB.
+- **E/S Assíncrona (Não Bloqueante):** Não utiliza *busy waiting* (espera ativa). As conclusões são notificadas por interrupções simuladas que atualizam registradores do TCB e tratam interrupções pendentes antes do término.
+
 ## Métricas
 
 Retorno = finalização − chegada. Espera da thread = soma dos intervalos na fila de prontos. Resposta = primeira utilização de CPU útil − chegada; n/a quando não há instrução CPU. No processo, resposta considera a primeira CPU de qualquer thread; `espera_threads` é a soma das esperas das threads, podendo superar o tempo de vida do processo.
