@@ -14,6 +14,51 @@ Na pasta do projeto:
 
 ```powershell
 python main.py
+```
+
+O terminal fica aberto até `sair`. A tabela de processos e threads aparece quando
+os estados mudam ou ao digitar `ps`; comandos de arquivos não repetem a tabela.
+O sistema de arquivos, o editor e o formato `.sotxt` pertencem ao SO simulado.
+Os textos ficam nos blocos do disco virtual durante a sessão; nada é gravado no Windows.
+
+```text
+mkdir aula
+cd aula
+create notas.sotxt
+edit notas.sotxt
+Minha primeira anotação.
+.salvar
+cat notas.sotxt
+ls
+cd ..
+step
+run
+metricas
+sair
+```
+
+`edit` mostra o conteúdo atual e recebe o texto substituto, linha por linha: `.salvar`
+grava e `.cancelar` descarta a edição. Também aceita `edit notas.sotxt "texto novo"`.
+O formato guarda a assinatura `SOTXT/1`, o tamanho em bytes UTF-8 e o conteúdo,
+validados pelo leitor do simulador. `create a` e `create a.txt` criam `a.sotxt`.
+
+| Comando | Ação |
+|---|---|
+| `help`, `pwd`, `ls [pasta]`, `cd pasta` | Ajuda, diretório atual, listagem e navegação; aceita `..` |
+| `mkdir pasta`, `create nome`, `edit nome`, `cat nome`, `rm caminho` | Diretórios e textos no disco virtual |
+| `load [cenario\|arquivo.json] [opções]` | Prepara outra carga, mantendo os arquivos da sessão |
+| `step [N]`, `run`, `ps` | Avança N rodadas da agenda, conclui a carga ou consulta estados |
+| `metricas`, `log [N]`, `config`, `experimentos [opções]` | Resultados finais, eventos, parâmetros e comparações |
+| `sair` | Encerra a sessão e descarta o estado em memória |
+
+O clock só avança com `step` ou `run`. Uma rodada pode processar eventos no mesmo
+clock, como trocas de contexto de custo zero. Novas cargas usam o mesmo disco da
+sessão. Sua capacidade é definida ao iniciar, por exemplo:
+`python main.py --interativo --numero-blocos 128`.
+
+Os comandos anteriores com argumentos continuam executando uma simulação e encerrando:
+
+```powershell
 python main.py --ajuda
 python main.py --cenario arquivos
 python main.py --cenario verificacao --algoritmo rr --quantum 2
@@ -24,7 +69,7 @@ python main.py --cenario cpu --quantum 4 --custo-contexto 1
 python main.py --experimentos
 ```
 
-Cada execução termina automaticamente. `--sem-log` exibe configuração e métricas; `--json` apresenta a saída estruturada **no terminal**, sem salvar nada. Sem `--sem-log`, cada linha informa clock, evento, objeto e descrição. A configuração aparece no início.
+Nessas execuções com argumentos, `--sem-log` exibe configuração e métricas; `--json` apresenta a saída estruturada **no terminal**, sem salvar nada. Sem `--sem-log`, cada linha informa clock, evento, objeto e descrição. A configuração aparece no início. `--interativo` abre o terminal contínuo usando os parâmetros informados.
 
 Entrada padrão, no PowerShell:
 
@@ -36,6 +81,7 @@ Entrada padrão, no PowerShell:
 
 | Parâmetro | Padrão | Significado |
 |---|---:|---|
+| `--interativo` | sem argumentos | Terminal contínuo até `sair` |
 | `--cenario` | mista | cpu, es, mista, verificacao, memoria ou arquivos |
 | `--carga` | — | Caminho de JSON externo, ou `-` para entrada padrão; exclusivo com cenario |
 | `--algoritmo` | rr | fcfs, rr ou prioridades |
@@ -142,7 +188,7 @@ O horizonte global vai do clock 0 até o último evento, incluindo chegada tardi
 python -B -m unittest discover -s testes -v
 ```
 
-Resultado esperado: **32 testes, OK**. Cobrem estados, filas, quantum, métricas, tradução, FIFO, faltas compartilhadas, E/S bloqueante e assíncrona, arquivos, validação, determinismo e integração. Um teste bloqueia `open` e `io.open` durante as operações virtuais para comprovar que o núcleo não usa arquivos hospedeiros.
+Resultado esperado: **38 testes, OK**. Cobrem estados, filas, quantum, métricas, tradução, FIFO, faltas compartilhadas, E/S bloqueante e assíncrona, arquivos, validação, determinismo, integração e terminal contínuo. Os testes bloqueiam `open` e `io.open` durante operações virtuais para comprovar que o núcleo e o editor não usam arquivos hospedeiros.
 
 `verificacao.json` contém P1/T1 com CPU 3 e P2/T1 com CPU 2, chegada 0. Sem custo de contexto:
 
@@ -169,6 +215,7 @@ As três têm CPU útil 5, horizonte 5, utilização 100% e throughput 0,4. A ca
 | `simulador/carga.py` | Leitura e validação de cenários |
 | `simulador/configuracao.py` | Parâmetros e validação |
 | `simulador/terminal.py` | CLI, apresentação e experimentos |
+| `simulador/shell.py`, `simulador/texto.py` | Terminal contínuo, editor e formato `.sotxt` |
 | `cargas/` | Seis cenários JSON editáveis sem mudar classes |
 | `testes/` | Testes unitários e de integração |
 | `docs/` | Diagrama, guia e relatório técnico em Markdown e PDF |

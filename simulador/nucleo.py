@@ -90,6 +90,12 @@ class Simulador:
         self._atualizar_processo(self.processos[tcb.processo_id], causa)
 
     def executar(self) -> dict:
+        for _ in self.passos():
+            pass
+        return self.metricas()
+
+    def passos(self):
+        """Avança a mesma execução por eventos, preservando o estado entre comandos."""
         if self._executado:
             raise ErroSimulacao("Cada instância do simulador pode ser executada somente uma vez.")
         self._executado = True
@@ -108,10 +114,10 @@ class Simulador:
                 self._despachar()
             elif self.thread_atual is not None and not self.agenda:
                 raise RuntimeError("CPU ocupada sem evento de conclusão.")
+            yield self.clock
         if any(p.pcb.estado != Estado.FINALIZADO for p in self.processos.values()):
             raise RuntimeError("Simulação sem eventos, mas existem processos não finalizados.")
         self._registrar("FIM_SIMULACAO", "sistema", "Todos os processos e solicitações foram concluídos.")
-        return self.metricas()
 
     def _admitir(self, processo: Processo) -> None:
         self._registrar("CHEGADA", processo.pcb.identificador, "Processo admitido no clock lógico.")

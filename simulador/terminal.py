@@ -18,6 +18,7 @@ PASTA_CARGAS = Path(__file__).resolve().parent.parent / "cargas"
 def criar_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Simulador de SO orientado a objetos; dados somente em memória.")
     parser.add_argument("--ajuda", action="help", help="mostra esta ajuda e termina")
+    parser.add_argument("--interativo", action="store_true", help="abre o terminal contínuo (padrão sem argumentos)")
     origem = parser.add_mutually_exclusive_group()
     origem.add_argument("--carga", metavar="ARQUIVO", help="cenário JSON externo; use - para ler da entrada padrão")
     origem.add_argument("--cenario", choices=["cpu", "es", "mista", "verificacao", "memoria", "arquivos"],
@@ -85,6 +86,7 @@ def apresentar_metricas(metricas: dict) -> None:
 
 
 def main(argumentos: list[str] | None = None) -> int:
+    argumentos = sys.argv[1:] if argumentos is None else argumentos
     parser = criar_parser()
     opcoes = parser.parse_args(argumentos)
     try:
@@ -105,6 +107,9 @@ def main(argumentos: list[str] | None = None) -> int:
             caminho = opcoes.carga or str(PASTA_CARGAS / f"{opcoes.cenario}.json")
             processos = carregar_arquivo(caminho)
         simulador = Simulador(processos, configuracao)
+        if not argumentos or opcoes.interativo:
+            from .shell import Shell
+            return Shell(simulador).executar()
         metricas = simulador.executar()
         if opcoes.json:
             print(json.dumps({"configuracao": asdict(configuracao),

@@ -178,17 +178,17 @@ class SistemaArquivos:
                            f"fd={descritor}; dados={resultado!r}; posição={abertura.posicao}")
         return resultado
 
-    def escrever(self, pcb: PCB, descritor: int, texto: str, clock: int) -> None:
+    def escrever(self, pcb: PCB, descritor: int, texto: str, clock: int, *, substituir: bool = False) -> None:
         abertura = self._abertura(pcb, descritor)
-        if abertura.modo not in {"w", "rw", "a"}:
+        if abertura.modo not in {"w", "rw", "a"} or (substituir and abertura.modo == "a"):
             raise ErroSimulacao("Descritor não foi aberto para escrita.")
         self._exigir_permissao(abertura.arquivo, "w")
         dados = texto.encode("utf-8")
         anteriores = self.conteudo(abertura.arquivo)
-        posicao = len(anteriores) if abertura.modo == "a" else abertura.posicao
+        posicao = 0 if substituir else len(anteriores) if abertura.modo == "a" else abertura.posicao
         # Outros descritores podem ter truncado o mesmo arquivo: preenche o intervalo.
         anteriores = anteriores.ljust(posicao, b"\x00")
-        novos = anteriores[:posicao] + dados + anteriores[posicao + len(dados):]
+        novos = dados if substituir else anteriores[:posicao] + dados + anteriores[posicao + len(dados):]
         self._substituir_conteudo(abertura.arquivo, novos, clock)
         abertura.posicao = posicao + len(dados)
         self.log.registrar(clock, "ESCRITA_ARQUIVO", pcb.identificador,
