@@ -16,12 +16,43 @@ from .terminal import PASTA_CARGAS, apresentar_metricas, criar_parser, main
 from .texto import TextoSO
 
 
-AJUDA = """help | ls [pasta] | pwd | cd pasta | mkdir pasta | rm caminho
-create arquivo.sotxt | edit arquivo.sotxt [texto] | cat arquivo.sotxt
-load [cenario|arquivo.json] [opções] | step [quantidade] | run | ps
-metricas | log [quantidade] | config | experimentos [opções] | sair
-Editor: .salvar grava; .cancelar descarta. Nomes .txt viram .sotxt.
-Cenários: cpu, es, mista, verificacao, memoria, arquivos."""
+RESET = "\033[0m"
+CIANO = "\033[1;36m"
+VERDE = "\033[1;32m"
+VERMELHO = "\033[1;31m"
+AMARELO = "\033[1;33m"
+
+
+def colorir(texto: str, cor: str, ativo: bool) -> str:
+    if not ativo or "\033[" in texto:
+        return texto
+    return f"{cor}{texto}{RESET}"
+
+
+def ajuda(colorida: bool) -> str:
+    comando = lambda texto: colorir(texto, CIANO, colorida)
+    return f"""
+Comandos de arquivos:
+
+    {comando("ls")} [pasta]    {comando("pwd")}             {comando("cd")} pasta
+    {comando("mkdir")} pasta   {comando("rm")} caminho      {comando("create")} arquivo.sotxt
+    {comando("edit")} arquivo.sotxt [texto]    {comando("cat")} arquivo.sotxt
+
+Simulação:
+    {comando("load")} [cenario|arquivo.json] [opções]
+    {comando("step")} [quantidade]             {comando("run")}
+    {comando("ps")}            {comando("metricas")}       {comando("log")} [quantidade]
+    {comando("config")}        {comando("experimentos")} [opções]
+
+Editor: {colorir(".salvar", AMARELO, colorida)} grava; {colorir(".cancelar", AMARELO, colorida)} descarta.
+Nomes .txt viram .sotxt.
+Cenários: cpu, es, mista, verificacao, memoria, arquivos.
+
+{colorir("sair", VERMELHO, colorida)}
+"""
+
+
+AJUDA = ajuda(False)
 
 
 class Shell:
@@ -67,10 +98,12 @@ class Shell:
                 self.andamento = None
 
     def mostrar(self, mensagem: str) -> None:
-        if sys.stdout.isatty():
+        colorida = sys.stdout.isatty()
+        if colorida:
             print("\033[2J\033[H", end="")
-        print(f"SO / TERMINAL    {self.pasta}    |    disco: {len(self.fs.blocos)}/{self.fs.numero_blocos} blocos")
-        print(mensagem)
+        cabecalho = f"SO / TERMINAL    {self.pasta}    |    disco: {len(self.fs.blocos)}/{self.fs.numero_blocos} blocos"
+        print(colorir(cabecalho, CIANO, colorida))
+        print(colorir(mensagem, VERDE, colorida))
         painel = self.painel_processos()
         if self._mostrar_processos or painel != self._ultimo_painel:
             print(painel)
@@ -102,7 +135,7 @@ class Shell:
             self.ativo = False
             return "Sessão encerrada; disco virtual descartado."
         if comando == "help":
-            return AJUDA
+            return ajuda(sys.stdout.isatty())
         if comando == "pwd":
             return self.pasta
         if comando == "ls":
@@ -202,16 +235,18 @@ class Shell:
         return saida.getvalue()
 
     def executar(self) -> int:
-        mensagem = AJUDA
+        mensagem = ajuda(sys.stdout.isatty())
         while self.ativo:
             self.mostrar(mensagem)
             try:
-                mensagem = self.comando(input(f"so:{self.pasta}> "))
+                prompt = colorir(f"so:{self.pasta}> ", AMARELO, sys.stdout.isatty())
+                mensagem = self.comando(input(prompt))
             except EOFError:
                 break
             except KeyboardInterrupt:
-                mensagem = "Comando cancelado. Digite sair para encerrar."
+                mensagem = colorir("Comando cancelado. Digite sair para encerrar.",
+                                   AMARELO, sys.stdout.isatty())
             except (ValueError, OSError) as erro:
-                mensagem = f"Erro: {erro}"
+                mensagem = colorir(f"Erro: {erro}", VERMELHO, sys.stdout.isatty())
         print("Sessão encerrada; disco virtual descartado.")
         return 0
