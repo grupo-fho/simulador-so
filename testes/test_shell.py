@@ -60,19 +60,22 @@ class TesteShell(unittest.TestCase):
         shell = terminal()
         shell.comando("create guardado")
         shell.comando("edit guardado continua aqui")
-        shell.comando("step 2")
+        with patch("sys.stdout", new_callable=io.StringIO):
+            shell.comando("step 2")
         self.assertTrue(any(p.pcb.estado == Estado.EXECUTANDO for p in shell.sim.processos.values()))
         clock = shell.sim.clock
         shell.comando("ls")
         self.assertEqual(shell.sim.clock, clock)
-        shell.comando("run")
+        with patch("sys.stdout", new_callable=io.StringIO):
+            shell.comando("run")
         self.assertEqual(shell.sim.metricas()["tempo_total"], 27)
         self.assertEqual(shell.sim.metricas()["cpu_util"], 22)
         self.assertIn("MÉTRICAS", shell.comando("metricas"))
         shell.comando("load arquivos --algoritmo fcfs")
         self.assertIs(shell.sim.arquivos, shell.fs)
         self.assertEqual(shell.ler("/guardado.sotxt"), "continua aqui")
-        shell.comando("run")
+        with patch("sys.stdout", new_callable=io.StringIO):
+            shell.comando("run")
         self.assertTrue(any(r.tipo == "LISTAGEM" and "guardado.sotxt" in r.descricao
                             for r in shell.sim.log.registros))
         self.assertEqual(shell.ler("/guardado.sotxt"), "continua aqui")
@@ -94,6 +97,18 @@ class TesteShell(unittest.TestCase):
         with patch("builtins.input", side_effect=EOFError), patch("sys.stdout", new_callable=io.StringIO) as saida:
             self.assertEqual(main([]), 0)
         self.assertIn("SO / TERMINAL", saida.getvalue())
+
+    def test_step_e_run_exibem_os_eventos_conforme_avancam(self):
+        comandos = ["load verificacao --algoritmo rr --quantum 2", "step", "run", "sair"]
+        with patch("builtins.input", side_effect=comandos), patch("sys.stdout", new_callable=io.StringIO) as saida:
+            with patch.object(saida, "isatty", return_value=True):
+                self.assertEqual(main([]), 0)
+        texto = saida.getvalue()
+        self.assertEqual(texto.count("CONFIGURACAO"), 1)
+        self.assertLess(texto.index("DESPACHO"), texto.index("Pausado"))
+        self.assertLess(texto.index("Pausado"), texto.index("[00002] PREEMPCAO"))
+        self.assertLess(texto.index("FIM_SIMULACAO"), texto.index("Simulação concluída"))
+        self.assertNotIn("\033[2J", texto)
 
 
 if __name__ == "__main__":

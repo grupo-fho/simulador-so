@@ -51,9 +51,11 @@ validados pelo leitor do simulador. `create a` e `create a.txt` criam `a.sotxt`.
 | `metricas`, `log [N]`, `config`, `experimentos [opções]` | Resultados finais, eventos, parâmetros e comparações |
 | `sair` | Encerra a sessão e descarta o estado em memória |
 
-O clock só avança com `step` ou `run`. Uma rodada pode processar eventos no mesmo
-clock, como trocas de contexto de custo zero. Novas cargas usam o mesmo disco da
-sessão. Sua capacidade é definida ao iniciar, por exemplo:
+O clock só avança com `step` ou `run`. Os dois comandos exibem os eventos à medida
+que a simulação avança, com clock, objeto e descrição. A saída fica no histórico
+do terminal. Uma rodada pode processar eventos no mesmo clock, como trocas de
+contexto de custo zero. Novas cargas usam o mesmo disco da sessão. Sua capacidade
+é definida ao iniciar, por exemplo:
 `python main.py --interativo --numero-blocos 128`.
 
 Os comandos anteriores com argumentos continuam executando uma simulação e encerrando:

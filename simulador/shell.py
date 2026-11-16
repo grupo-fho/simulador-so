@@ -92,15 +92,17 @@ class Shell:
 
     def passo(self) -> None:
         if self.andamento is not None:
+            registros = self.sim.log.registros
+            inicio = len(registros)
             try:
                 next(self.andamento)
             except StopIteration:
                 self.andamento = None
+            for registro in registros[inicio:]:
+                print(registro, flush=True)
 
     def mostrar(self, mensagem: str) -> None:
         colorida = sys.stdout.isatty()
-        if colorida:
-            print("\033[2J\033[H", end="")
         cabecalho = f"SO / TERMINAL    {self.pasta}    |    disco: {len(self.fs.blocos)}/{self.fs.numero_blocos} blocos"
         print(colorir(cabecalho, CIANO, colorida))
         print(colorir(mensagem, VERDE, colorida))
